@@ -6,6 +6,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using NetworkService.Model;
 using NetworkService.ViewModel;
+using System.ComponentModel;
+
 
 namespace NetworkService.Views
 {
@@ -27,9 +29,34 @@ namespace NetworkService.Views
         private void NetworkDisplayView_Loaded(object sender, RoutedEventArgs e)
         {
             AttachConnectionsCollection();
+            AttachDisplaySlotChanges();
             RedrawConnectionLines();
         }
+        private void AttachDisplaySlotChanges()
+        {
+            NetworkDisplayViewModel viewModel = DataContext as NetworkDisplayViewModel;
 
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            foreach (DisplaySlot slot in viewModel.DisplaySlots)
+            {
+                slot.PropertyChanged -= DisplaySlot_PropertyChanged;
+                slot.PropertyChanged += DisplaySlot_PropertyChanged;
+            }
+        }
+
+        private void DisplaySlot_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "OccupiedEntity" ||
+                e.PropertyName == "IsOccupied" ||
+                e.PropertyName == "IsValueInvalid")
+            {
+                Dispatcher.BeginInvoke(new System.Action(RedrawConnectionLines));
+            }
+        }
         private void NetworkDisplayView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             RedrawConnectionLines();

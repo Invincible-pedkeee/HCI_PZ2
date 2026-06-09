@@ -1,6 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NetworkService.Helpers;
+ 
+using NetworkService.Helpers.Undo;
 using NetworkService.Model;
 using NetworkService.Services;
 
@@ -9,6 +12,8 @@ namespace NetworkService.ViewModel
     public class NetworkDisplayViewModel : BindableBase
     {
         private readonly NetworkDataService dataService;
+        private readonly Stack<UndoAction> undoActions;
+
         private ObservableCollection<EntitiesByType> availableEntityGroups;
         private DisplaySlot selectedConnectionSlot;
         private string connectionInfoText;
@@ -61,9 +66,17 @@ namespace NetworkService.ViewModel
             }
         }
 
+        public MyICommand UndoCommand { get; private set; }
+
+        public MyICommand UndoAllCommand { get; private set; }
+
         public NetworkDisplayViewModel(NetworkDataService dataService)
         {
             this.dataService = dataService;
+            undoActions = new Stack<UndoAction>();
+
+            UndoCommand = new MyICommand(OnUndo, CanUndo);
+            UndoAllCommand = new MyICommand(OnUndoAll, CanUndo);
 
             ConnectionInfoText = "Za kreiranje veze kliknite Poveži na prvom, zatim na drugom entitetu.";
             RefreshAvailableEntityGroups();
@@ -100,6 +113,21 @@ namespace NetworkService.ViewModel
 
             slot.PlaceEntity(entity);
 
+            RegisterUndoAction(new UndoAction(
+                "postavljanje entiteta ID: " + entity.Id + " na slot " + slot.SlotNumber,
+                () =>
+                {
+                    DisplaySlot currentSlot = FindSlotForEntity(entity);
+
+                    if (currentSlot != null)
+                    {
+                        currentSlot.RemoveEntity();
+                        dataService.RemoveConnectionsForEntity(entity);
+                    }
+
+                    RefreshAvailableEntityGroups();
+                }));
+
             RefreshAvailableEntityGroups();
 
             dataService.AddHistory("Entitet ID: " + entity.Id + " postavljen na mrežu, slot " + slot.SlotNumber + ".");
@@ -123,14 +151,34 @@ namespace NetworkService.ViewModel
             }
 
             NetworkEntity entity = sourceSlot.RemoveEntity();
+
+            int sourceSlotNumber = sourceSlot.SlotNumber;
+            int targetSlotNumber = targetSlot.SlotNumber;
+
             targetSlot.PlaceEntity(entity);
+
+            RegisterUndoAction(new UndoAction(
+                "premještanje entiteta ID: " + entity.Id,
+                () =>
+                {
+                    DisplaySlot currentSlot = FindSlotForEntity(entity);
+                    DisplaySlot originalSlot = FindSlotByNumber(sourceSlotNumber);
+
+                    if (currentSlot != null && originalSlot != null && !originalSlot.IsOccupied)
+                    {
+                        currentSlot.RemoveEntity();
+                        originalSlot.PlaceEntity(entity);
+                    }
+
+                    RefreshAvailableEntityGroups();
+                }));
 
             RefreshAvailableEntityGroups();
 
             dataService.AddHistory(
                 "Entitet ID: " + entity.Id +
-                " premješten sa slota " + sourceSlot.SlotNumber +
-                " na slot " + targetSlot.SlotNumber + ".");
+                " premješten sa slota " + sourceSlotNumber +
+                " na slot " + targetSlotNumber + ".");
         }
 
         public void RemoveEntityFromSlot(DisplaySlot slot)
@@ -140,14 +188,35 @@ namespace NetworkService.ViewModel
                 return;
             }
 
-            NetworkEntity removedEntity = slot.RemoveEntity();
+            NetworkEntity removedEntity = slot.OccupiedEntity;
+            int slotNumber = slot.SlotNumber;
 
+            List<ConnectionLine> removedConnections = dataService.Connections
+                .Where(connection => connection.ContainsEntity(removedEntity))
+                .ToList();
+
+            slot.RemoveEntity();
             dataService.RemoveConnectionsForEntity(removedEntity);
 
             if (selectedConnectionSlot == slot)
             {
                 ClearSelectedConnectionSlot();
             }
+
+            RegisterUndoAction(new UndoAction(
+                "uklanjanje entiteta ID: " + removedEntity.Id + " sa mreže",
+                () =>
+                {
+                    DisplaySlot originalSlot = FindSlotByNumber(slotNumber);
+
+                    if (originalSlot != null && !originalSlot.IsOccupied)
+                    {
+                        originalSlot.PlaceEntity(removedEntity);
+                        RestoreConnections(removedConnections);
+                    }
+
+                    RefreshAvailableEntityGroups();
+                }));
 
             RefreshAvailableEntityGroups();
 
@@ -187,7 +256,15 @@ namespace NetworkService.ViewModel
                 return;
             }
 
-            dataService.Connections.Add(new ConnectionLine(firstEntity, secondEntity));
+            ConnectionLine connection = new ConnectionLine(firstEntity, secondEntity);
+            dataService.Connections.Add(connection);
+
+            RegisterUndoAction(new UndoAction(
+                "kreiranje veze ID: " + firstEntity.Id + " - ID: " + secondEntity.Id,
+                () =>
+                {
+                    dataService.Connections.Remove(connection);
+                }));
 
             dataService.AddHistory(
                 "Kreirana veza između entiteta ID: " +
@@ -198,9 +275,88 @@ namespace NetworkService.ViewModel
             ConnectionInfoText = "Veza je uspješno kreirana.";
         }
 
+        private bool CanUndo()
+        {
+            return undoActions.Count > 0;
+        }
+
+        private void OnUndo()
+        {
+            if (!CanUndo())
+            {
+                return;
+            }
+
+            UndoAction undoAction = undoActions.Pop();
+            undoAction.Execute();
+
+            dataService.AddHistory("Undo izvršen na prikazu mreže: " + undoAction.Description);
+
+            RefreshUndoCommands();
+        }
+
+        private void OnUndoAll()
+        {
+            if (!CanUndo())
+            {
+                return;
+            }
+
+            int actionCount = undoActions.Count;
+
+            while (undoActions.Count > 0)
+            {
+                UndoAction undoAction = undoActions.Pop();
+                undoAction.Execute();
+            }
+
+            dataService.AddHistory("Undo All izvršen na prikazu mreže. Broj poništenih akcija: " + actionCount);
+
+            RefreshUndoCommands();
+        }
+
+        private void RegisterUndoAction(UndoAction undoAction)
+        {
+            undoActions.Push(undoAction);
+            RefreshUndoCommands();
+        }
+
+        private void RefreshUndoCommands()
+        {
+            UndoCommand.RaiseCanExecuteChanged();
+            UndoAllCommand.RaiseCanExecuteChanged();
+        }
+
+        private DisplaySlot FindSlotForEntity(NetworkEntity entity)
+        {
+            return dataService.DisplaySlots.FirstOrDefault(slot => slot.OccupiedEntity == entity);
+        }
+
+        private DisplaySlot FindSlotByNumber(int slotNumber)
+        {
+            return dataService.DisplaySlots.FirstOrDefault(slot => slot.SlotNumber == slotNumber);
+        }
+
         private bool ConnectionAlreadyExists(NetworkEntity firstEntity, NetworkEntity secondEntity)
         {
             return dataService.Connections.Any(connection => connection.Connects(firstEntity, secondEntity));
+        }
+
+        private void RestoreConnections(List<ConnectionLine> connections)
+        {
+            foreach (ConnectionLine connection in connections)
+            {
+                if (!dataService.Entities.Contains(connection.FirstEntity) ||
+                    !dataService.Entities.Contains(connection.SecondEntity))
+                {
+                    continue;
+                }
+
+                if (!ConnectionAlreadyExists(connection.FirstEntity, connection.SecondEntity))
+                {
+                    dataService.Connections.Add(connection);
+                }
+            }
         }
 
         private void ClearSelectedConnectionSlot()
