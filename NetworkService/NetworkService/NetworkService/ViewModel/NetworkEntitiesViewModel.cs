@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NetworkService.Helpers;
-
+ 
+using NetworkService.Helpers.Undo;
 using NetworkService.Model;
 using NetworkService.Services;
 
@@ -10,6 +12,7 @@ namespace NetworkService.ViewModel
     public class NetworkEntitiesViewModel : BindableBase
     {
         private readonly NetworkDataService dataService;
+        private readonly Stack<UndoAction> undoActions;
 
         private NetworkEntityInput currentEntityInput;
         private NetworkEntity selectedEntity;
@@ -25,13 +28,7 @@ namespace NetworkService.ViewModel
         private string filterIdError;
         private string filterComparisonError;
 
-        public ObservableCollection<NetworkEntity> Entities
-        {
-            get
-            {
-                return dataService.Entities;
-            }
-        }
+        private EntityFilterState appliedFilterState;
 
         public ObservableCollection<NetworkEntity> FilteredEntities
         {
@@ -186,9 +183,14 @@ namespace NetworkService.ViewModel
 
         public MyICommand ClearFilterCommand { get; private set; }
 
+        public MyICommand UndoCommand { get; private set; }
+
+        public MyICommand UndoAllCommand { get; private set; }
+
         public NetworkEntitiesViewModel(NetworkDataService dataService)
         {
             this.dataService = dataService;
+            undoActions = new Stack<UndoAction>();
 
             CurrentEntityInput = new NetworkEntityInput(dataService.Entities);
 
@@ -207,6 +209,7 @@ namespace NetworkService.ViewModel
             };
 
             SelectedStatusFilter = "Sva stanja";
+            appliedFilterState = CaptureCurrentFilterState();
 
             FilteredEntities = new ObservableCollection<NetworkEntity>(dataService.Entities);
 
@@ -217,6 +220,9 @@ namespace NetworkService.ViewModel
 
             ApplyFilterCommand = new MyICommand(OnApplyFilter);
             ClearFilterCommand = new MyICommand(OnClearFilter);
+
+            UndoCommand = new MyICommand(OnUndo, CanUndo);
+            UndoAllCommand = new MyICommand(OnUndoAll, CanUndo);
         }
 
         private void OnAddEntity()
@@ -240,8 +246,17 @@ namespace NetworkService.ViewModel
 
             dataService.AddEntity(entity);
 
+            RegisterUndoAction(new UndoAction(
+                "dodavanje entiteta ID: " + entity.Id,
+                () =>
+                {
+                    dataService.Entities.Remove(entity);
+                    SelectedEntity = null;
+                    RefreshTableUsingAppliedFilter();
+                }));
+
             CurrentEntityInput = new NetworkEntityInput(dataService.Entities);
-            RefreshFilteredEntities(dataService.Entities);
+            RefreshTableUsingAppliedFilter();
         }
 
         private bool CanDeleteEntity()
@@ -262,11 +277,22 @@ namespace NetworkService.ViewModel
                 return;
             }
 
-            dataService.DeleteEntity(SelectedEntity);
+            NetworkEntity entityToDelete = SelectedEntity;
+            int originalIndex = dataService.Entities.IndexOf(entityToDelete);
+
+            dataService.DeleteEntity(entityToDelete);
+
+            RegisterUndoAction(new UndoAction(
+                "brisanje entiteta ID: " + entityToDelete.Id,
+                () =>
+                {
+                    RestoreEntityAtIndex(entityToDelete, originalIndex);
+                    RefreshTableUsingAppliedFilter();
+                }));
+
             SelectedEntity = null;
             IsDeleteDialogVisible = false;
-
-            OnApplyFilter();
+            RefreshTableUsingAppliedFilter();
         }
 
         private void OnCancelDeleteEntity()
@@ -284,57 +310,181 @@ namespace NetworkService.ViewModel
                 return;
             }
 
-            var query = dataService.Entities.AsEnumerable();
+            EntityFilterState previousFilterState = appliedFilterState;
+            EntityFilterState newFilterState = CaptureCurrentFilterState();
 
-            if (SelectedFilterType != null)
-            {
-                query = query.Where(entity => entity.Type != null &&
-                                              entity.Type.Name == SelectedFilterType.Name);
-            }
+            appliedFilterState = newFilterState;
+            RefreshTableUsingAppliedFilter();
 
-            if (!string.IsNullOrWhiteSpace(FilterIdText))
-            {
-                int idValue = int.Parse(FilterIdText);
-
-                if (SelectedIdComparison == "<")
+            RegisterUndoAction(new UndoAction(
+                "primjena filtera nad tabelom entiteta",
+                () =>
                 {
-                    query = query.Where(entity => entity.Id < idValue);
-                }
-                else if (SelectedIdComparison == ">")
-                {
-                    query = query.Where(entity => entity.Id > idValue);
-                }
-                else if (SelectedIdComparison == "=")
-                {
-                    query = query.Where(entity => entity.Id == idValue);
-                }
-            }
-
-            if (SelectedStatusFilter == "Unutar opsega")
-            {
-                query = query.Where(entity => entity.IsValueValid);
-            }
-            else if (SelectedStatusFilter == "Van opsega")
-            {
-                query = query.Where(entity => !entity.IsValueValid);
-            }
-
-            RefreshFilteredEntities(query);
+                    RestoreFilterState(previousFilterState);
+                }));
 
             dataService.AddHistory("Primijenjen filter nad tabelom entiteta.");
         }
 
         private void OnClearFilter()
         {
+            EntityFilterState previousFilterState = appliedFilterState;
+
             SelectedFilterType = null;
             SelectedIdComparison = null;
             FilterIdText = string.Empty;
             SelectedStatusFilter = "Sva stanja";
 
             ClearFilterErrors();
-            RefreshFilteredEntities(dataService.Entities);
+
+            appliedFilterState = CaptureCurrentFilterState();
+            RefreshTableUsingAppliedFilter();
+
+            RegisterUndoAction(new UndoAction(
+                "poništavanje filtera nad tabelom entiteta",
+                () =>
+                {
+                    RestoreFilterState(previousFilterState);
+                }));
 
             dataService.AddHistory("Poništeni svi filteri u tabeli entiteta.");
+        }
+
+        private bool CanUndo()
+        {
+            return undoActions.Count > 0;
+        }
+
+        private void OnUndo()
+        {
+            if (!CanUndo())
+            {
+                return;
+            }
+
+            UndoAction undoAction = undoActions.Pop();
+            undoAction.Execute();
+
+            dataService.AddHistory("Undo izvršen: " + undoAction.Description);
+
+            RefreshUndoCommands();
+        }
+
+        private void OnUndoAll()
+        {
+            if (!CanUndo())
+            {
+                return;
+            }
+
+            int numberOfActions = undoActions.Count;
+
+            while (undoActions.Count > 0)
+            {
+                UndoAction undoAction = undoActions.Pop();
+                undoAction.Execute();
+            }
+
+            dataService.AddHistory("Undo All izvršen. Broj poništenih akcija: " + numberOfActions);
+
+            RefreshUndoCommands();
+        }
+
+        private void RegisterUndoAction(UndoAction undoAction)
+        {
+            undoActions.Push(undoAction);
+            RefreshUndoCommands();
+        }
+
+        private void RefreshUndoCommands()
+        {
+            UndoCommand.RaiseCanExecuteChanged();
+            UndoAllCommand.RaiseCanExecuteChanged();
+        }
+
+        private void RestoreEntityAtIndex(NetworkEntity entity, int index)
+        {
+            if (dataService.Entities.Contains(entity))
+            {
+                return;
+            }
+
+            if (index < 0 || index > dataService.Entities.Count)
+            {
+                dataService.Entities.Add(entity);
+            }
+            else
+            {
+                dataService.Entities.Insert(index, entity);
+            }
+        }
+
+        private EntityFilterState CaptureCurrentFilterState()
+        {
+            return new EntityFilterState(
+                SelectedFilterType,
+                SelectedIdComparison,
+                FilterIdText,
+                SelectedStatusFilter);
+        }
+
+        private void RestoreFilterState(EntityFilterState filterState)
+        {
+            SelectedFilterType = filterState.SelectedFilterType;
+            SelectedIdComparison = filterState.SelectedIdComparison;
+            FilterIdText = filterState.FilterIdText;
+            SelectedStatusFilter = filterState.SelectedStatusFilter;
+
+            appliedFilterState = filterState;
+
+            ClearFilterErrors();
+            RefreshTableUsingAppliedFilter();
+        }
+
+        private void RefreshTableUsingAppliedFilter()
+        {
+            var query = CreateFilteredQuery(appliedFilterState);
+            RefreshFilteredEntities(query);
+        }
+
+        private IEnumerable<NetworkEntity> CreateFilteredQuery(EntityFilterState filterState)
+        {
+            var query = dataService.Entities.AsEnumerable();
+
+            if (filterState.SelectedFilterType != null)
+            {
+                query = query.Where(entity => entity.Type != null &&
+                                              entity.Type.Name == filterState.SelectedFilterType.Name);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filterState.FilterIdText))
+            {
+                int idValue = int.Parse(filterState.FilterIdText);
+
+                if (filterState.SelectedIdComparison == "<")
+                {
+                    query = query.Where(entity => entity.Id < idValue);
+                }
+                else if (filterState.SelectedIdComparison == ">")
+                {
+                    query = query.Where(entity => entity.Id > idValue);
+                }
+                else if (filterState.SelectedIdComparison == "=")
+                {
+                    query = query.Where(entity => entity.Id == idValue);
+                }
+            }
+
+            if (filterState.SelectedStatusFilter == "Unutar opsega")
+            {
+                query = query.Where(entity => entity.IsValueValid);
+            }
+            else if (filterState.SelectedStatusFilter == "Van opsega")
+            {
+                query = query.Where(entity => !entity.IsValueValid);
+            }
+
+            return query;
         }
 
         private bool IsFilterInputValid()
@@ -372,7 +522,7 @@ namespace NetworkService.ViewModel
             FilterComparisonError = string.Empty;
         }
 
-        private void RefreshFilteredEntities(System.Collections.Generic.IEnumerable<NetworkEntity> entities)
+        private void RefreshFilteredEntities(IEnumerable<NetworkEntity> entities)
         {
             FilteredEntities = new ObservableCollection<NetworkEntity>(entities);
         }

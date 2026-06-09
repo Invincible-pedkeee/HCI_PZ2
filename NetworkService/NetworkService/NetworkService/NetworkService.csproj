@@ -58,8 +58,10 @@
     <Compile Include="Helpers\BindableBase.cs" />
     <Compile Include="Helpers\Commands\MyICommand.cs" />
     <Compile Include="Helpers\Commands\MyICommandWithParameter.cs" />
+    <Compile Include="Helpers\Undo\UndoAction.cs" />
     <Compile Include="Helpers\Validations\ValidationBase.cs" />
     <Compile Include="Helpers\Validations\ValidationErrors.cs" />
+    <Compile Include="Model\EntityFilterState.cs" />
     <Compile Include="Model\EntityType.cs" />
     <Compile Include="Model\HistoryAction.cs" />
     <Compile Include="Model\Measurement.cs" />
