@@ -7,6 +7,7 @@ namespace NetworkService.Services
 {
     public class NetworkDataService
     {
+        private readonly MeasurementLogService measurementLogService;
         public ObservableCollection<EntityType> EntityTypes { get; private set; }
         public ObservableCollection<ConnectionLine> Connections { get; private set; }
         public ObservableCollection<DisplaySlot> DisplaySlots { get; private set; }
@@ -18,6 +19,8 @@ namespace NetworkService.Services
 
         public NetworkDataService()
         {
+            measurementLogService = new MeasurementLogService();
+
             EntityTypes = new ObservableCollection<EntityType>();
             Entities = new ObservableCollection<NetworkEntity>();
             Measurements = new ObservableCollection<Measurement>();
@@ -133,6 +136,7 @@ namespace NetworkService.Services
                 entity.IsValueValid);
 
             Measurements.Add(measurement);
+            measurementLogService.WriteMeasurement(measurement, entity);
 
             AddHistory("Primljeno mjerenje za ID: " + entity.Id + ", vrijednost: " + value);
 

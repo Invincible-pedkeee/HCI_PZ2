@@ -70,6 +70,8 @@
     <Compile Include="Model\Measurement.cs" />
     <Compile Include="Model\NetworkEntity.cs" />
     <Compile Include="Model\NetworkEntityInput.cs" />
+    <Compile Include="Services\MeasurementLogService.cs" />
+    <Compile Include="Services\MeteringReceiverService.cs" />
     <Compile Include="Services\NetworkDataService.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\MeasurementGraphViewModel.cs" />
