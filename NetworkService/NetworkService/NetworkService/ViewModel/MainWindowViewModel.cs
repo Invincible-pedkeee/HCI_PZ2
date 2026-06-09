@@ -63,6 +63,7 @@ namespace NetworkService.ViewModel
             }
             else if (destination == "display")
             {
+                networkDisplayViewModel.RefreshAvailableEntityGroups();
                 CurrentViewModel = networkDisplayViewModel;
                 StatusMessage = "Prikazana mreža za monitoring.";
             }

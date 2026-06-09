@@ -9,6 +9,7 @@ namespace NetworkService.Services
     {
         public ObservableCollection<EntityType> EntityTypes { get; private set; }
 
+        public ObservableCollection<DisplaySlot> DisplaySlots { get; private set; }
         public ObservableCollection<NetworkEntity> Entities { get; private set; }
 
         public ObservableCollection<Measurement> Measurements { get; private set; }
@@ -21,13 +22,21 @@ namespace NetworkService.Services
             Entities = new ObservableCollection<NetworkEntity>();
             Measurements = new ObservableCollection<Measurement>();
             HistoryActions = new ObservableCollection<HistoryAction>();
+            DisplaySlots = new ObservableCollection<DisplaySlot>();
 
             LoadEntityTypes();
             LoadInitialEntities();
+            LoadDisplaySlots();
 
             AddHistory("Sistem pokrenut.");
         }
-
+        private void LoadDisplaySlots()
+        {
+            for (int i = 1; i <= 12; i++)
+            {
+                DisplaySlots.Add(new DisplaySlot(i));
+            }
+        }
         private void LoadEntityTypes()
         {
             EntityTypes.Add(new EntityType("IA", "Resources/Images/road_ia.png", 15000));
@@ -126,5 +135,7 @@ namespace NetworkService.Services
                 HistoryActions.RemoveAt(HistoryActions.Count - 1);
             }
         }
+
+
     }
 }
