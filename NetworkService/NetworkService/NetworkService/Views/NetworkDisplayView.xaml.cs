@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using NetworkService.Model;
 using NetworkService.ViewModel;
 
@@ -9,6 +10,7 @@ namespace NetworkService.Views
     {
         private bool isDragging;
         private NetworkEntity draggedEntity;
+        private DisplaySlot sourceSlot;
 
         public NetworkDisplayView()
         {
@@ -26,8 +28,11 @@ namespace NetworkService.Views
             {
                 isDragging = true;
                 draggedEntity = selectedEntity;
+                sourceSlot = null;
 
                 DragDrop.DoDragDrop(this, draggedEntity, DragDropEffects.Move);
+
+                ResetDragState();
             }
         }
 
@@ -36,12 +41,40 @@ namespace NetworkService.Views
             ResetDragState();
         }
 
+        private void DisplaySlot_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (isDragging)
+            {
+                return;
+            }
+
+            if (IsOriginalSourceInsideButton(e.OriginalSource as DependencyObject))
+            {
+                return;
+            }
+
+            DisplaySlot slot = GetDisplaySlotFromSender(sender);
+
+            if (slot == null || !slot.IsOccupied)
+            {
+                return;
+            }
+
+            isDragging = true;
+            sourceSlot = slot;
+            draggedEntity = slot.OccupiedEntity;
+
+            DragDrop.DoDragDrop(this, draggedEntity, DragDropEffects.Move);
+
+            ResetDragState();
+        }
+
         private void DisplaySlot_DragOver(object sender, DragEventArgs e)
         {
-            DisplaySlot slot = GetDisplaySlotFromSender(sender);
+            DisplaySlot targetSlot = GetDisplaySlotFromSender(sender);
             NetworkEntity entity = GetDraggedEntityFromEvent(e);
 
-            if (entity != null && slot != null && !slot.IsOccupied)
+            if (entity != null && targetSlot != null && !targetSlot.IsOccupied)
             {
                 e.Effects = DragDropEffects.Move;
             }
@@ -55,16 +88,23 @@ namespace NetworkService.Views
 
         private void DisplaySlot_Drop(object sender, DragEventArgs e)
         {
-            DisplaySlot slot = GetDisplaySlotFromSender(sender);
+            DisplaySlot targetSlot = GetDisplaySlotFromSender(sender);
             NetworkEntity entity = GetDraggedEntityFromEvent(e);
 
-            if (entity != null && slot != null)
+            if (entity != null && targetSlot != null)
             {
                 NetworkDisplayViewModel viewModel = DataContext as NetworkDisplayViewModel;
 
                 if (viewModel != null)
                 {
-                    viewModel.DropEntityToSlot(entity, slot);
+                    if (sourceSlot != null)
+                    {
+                        viewModel.MoveEntityBetweenSlots(sourceSlot, targetSlot);
+                    }
+                    else
+                    {
+                        viewModel.DropEntityToSlot(entity, targetSlot);
+                    }
                 }
             }
 
@@ -124,10 +164,26 @@ namespace NetworkService.Views
             return null;
         }
 
+        private bool IsOriginalSourceInsideButton(DependencyObject source)
+        {
+            while (source != null)
+            {
+                if (source is Button)
+                {
+                    return true;
+                }
+
+                source = VisualTreeHelper.GetParent(source);
+            }
+
+            return false;
+        }
+
         private void ResetDragState()
         {
             isDragging = false;
             draggedEntity = null;
+            sourceSlot = null;
         }
     }
 }

@@ -82,6 +82,34 @@ namespace NetworkService.ViewModel
             dataService.AddHistory("Entitet ID: " + entity.Id + " postavljen na mrežu, slot " + slot.SlotNumber + ".");
         }
 
+        public void MoveEntityBetweenSlots(DisplaySlot sourceSlot, DisplaySlot targetSlot)
+        {
+            if (sourceSlot == null || targetSlot == null)
+            {
+                return;
+            }
+
+            if (!sourceSlot.IsOccupied || targetSlot.IsOccupied)
+            {
+                return;
+            }
+
+            if (sourceSlot == targetSlot)
+            {
+                return;
+            }
+
+            NetworkEntity entity = sourceSlot.RemoveEntity();
+            targetSlot.PlaceEntity(entity);
+
+            RefreshAvailableEntityGroups();
+
+            dataService.AddHistory(
+                "Entitet ID: " + entity.Id +
+                " premješten sa slota " + sourceSlot.SlotNumber +
+                " na slot " + targetSlot.SlotNumber + ".");
+        }
+
         public void RemoveEntityFromSlot(DisplaySlot slot)
         {
             if (slot == null || !slot.IsOccupied)

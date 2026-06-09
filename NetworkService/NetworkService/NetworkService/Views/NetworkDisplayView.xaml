@@ -93,6 +93,7 @@
                                 BorderBrush="#A8A8A8"
                                 BorderThickness="1"
                                 AllowDrop="True"
+                                MouseLeftButtonDown="DisplaySlot_MouseLeftButtonDown"
                                 DragOver="DisplaySlot_DragOver"
                                 Drop="DisplaySlot_Drop">
 
