@@ -47,6 +47,7 @@
                                         Margin="0,4,0,4">
                                 <TextBlock FontWeight="SemiBold"
                                            Text="{Binding Name}"/>
+
                                 <TextBlock FontSize="11"
                                            Foreground="Gray">
                                     <TextBlock.Text>
@@ -72,84 +73,117 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="PRIKAZ MREŽE"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,10"/>
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="PRIKAZ MREŽE"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,4"/>
 
-            <ItemsControl Grid.Row="1"
-                          ItemsSource="{Binding DisplaySlots}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Rows="3"
-                                     Columns="4"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                <TextBlock Text="{Binding ConnectionInfoText}"
+                           FontSize="11"
+                           Foreground="Gray"
+                           Margin="0,0,0,8"/>
+            </StackPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="6"
-                                Padding="10"
-                                BorderBrush="#A8A8A8"
-                                BorderThickness="1"
-                                AllowDrop="True"
-                                MouseLeftButtonDown="DisplaySlot_MouseLeftButtonDown"
-                                DragOver="DisplaySlot_DragOver"
-                                Drop="DisplaySlot_Drop">
+            <Grid Grid.Row="1">
 
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#FAFAFA"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsOccupied}" Value="True">
-                                            <Setter Property="Background" Value="#EEF5FF"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsValueInvalid}" Value="True">
-                                            <Setter Property="Background" Value="#FFE3E3"/>
-                                            <Setter Property="BorderBrush" Value="#AA0000"/>
-                                            <Setter Property="BorderThickness" Value="2"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
+                <ItemsControl x:Name="DisplaySlotsItemsControl"
+                              ItemsSource="{Binding DisplaySlots}">
 
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="3"
+                                         Columns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                                <TextBlock Text="{Binding TitleText}"
-                                           FontWeight="SemiBold"
-                                           TextWrapping="Wrap"/>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="6"
+                                    Padding="10"
+                                    BorderBrush="#A8A8A8"
+                                    BorderThickness="1"
+                                    AllowDrop="True"
+                                    MouseLeftButtonDown="DisplaySlot_MouseLeftButtonDown"
+                                    DragOver="DisplaySlot_DragOver"
+                                    Drop="DisplaySlot_Drop">
 
-                                <StackPanel Grid.Row="1"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding DetailsText}"
-                                               TextWrapping="Wrap"
-                                               TextAlignment="Center"
-                                               FontSize="12"/>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#FAFAFA"/>
 
-                                    <TextBlock Text="{Binding StatusText}"
-                                               TextWrapping="Wrap"
-                                               TextAlignment="Center"
-                                               FontSize="12"
-                                               Margin="0,8,0,0"/>
-                                </StackPanel>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsOccupied}" Value="True">
+                                                <Setter Property="Background" Value="#EEF5FF"/>
+                                            </DataTrigger>
 
-                                <Button Grid.Row="2"
-                                        Content="Ukloni"
-                                        Height="24"
-                                        Margin="0,8,0,0"
-                                        Click="RemoveSlotButton_Click"
-                                        Cursor="Hand"
-                                        ToolTip="Remove entity from this display slot"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                            <DataTrigger Binding="{Binding IsValueInvalid}" Value="True">
+                                                <Setter Property="Background" Value="#FFE3E3"/>
+                                                <Setter Property="BorderBrush" Value="#AA0000"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                               Text="{Binding TitleText}"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap"/>
+
+                                    <StackPanel Grid.Row="1"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="{Binding DetailsText}"
+                                                   TextWrapping="Wrap"
+                                                   TextAlignment="Center"
+                                                   FontSize="12"/>
+
+                                        <TextBlock Text="{Binding StatusText}"
+                                                   TextWrapping="Wrap"
+                                                   TextAlignment="Center"
+                                                   FontSize="12"
+                                                   Margin="0,8,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,8,0,0">
+
+                                        <Button Content="Poveži"
+                                                Width="65"
+                                                Height="24"
+                                                Click="ConnectSlotButton_Click"
+                                                Cursor="Hand"
+                                                ToolTip="Create connection with another occupied slot"/>
+
+                                        <Button Content="Ukloni"
+                                                Width="65"
+                                                Height="24"
+                                                Margin="6,0,0,0"
+                                                Click="RemoveSlotButton_Click"
+                                                Cursor="Hand"
+                                                ToolTip="Remove entity from this display slot"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Canvas for drawing connection lines over display slots -->
+                <Canvas x:Name="ConnectionsCanvas"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="10"/>
+            </Grid>
         </Grid>
 
         <!-- RIGHT HISTORY PANEL -->

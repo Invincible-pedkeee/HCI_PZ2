@@ -10,6 +10,8 @@ namespace NetworkService.ViewModel
     {
         private readonly NetworkDataService dataService;
         private ObservableCollection<EntitiesByType> availableEntityGroups;
+        private DisplaySlot selectedConnectionSlot;
+        private string connectionInfoText;
 
         public ObservableCollection<EntitiesByType> AvailableEntityGroups
         {
@@ -31,6 +33,14 @@ namespace NetworkService.ViewModel
             }
         }
 
+        public ObservableCollection<ConnectionLine> Connections
+        {
+            get
+            {
+                return dataService.Connections;
+            }
+        }
+
         public ObservableCollection<HistoryAction> HistoryActions
         {
             get
@@ -39,10 +49,23 @@ namespace NetworkService.ViewModel
             }
         }
 
+        public string ConnectionInfoText
+        {
+            get
+            {
+                return connectionInfoText;
+            }
+            set
+            {
+                SetProperty(ref connectionInfoText, value);
+            }
+        }
+
         public NetworkDisplayViewModel(NetworkDataService dataService)
         {
             this.dataService = dataService;
 
+            ConnectionInfoText = "Za kreiranje veze kliknite Poveži na prvom, zatim na drugom entitetu.";
             RefreshAvailableEntityGroups();
         }
 
@@ -119,9 +142,70 @@ namespace NetworkService.ViewModel
 
             NetworkEntity removedEntity = slot.RemoveEntity();
 
+            dataService.RemoveConnectionsForEntity(removedEntity);
+
+            if (selectedConnectionSlot == slot)
+            {
+                ClearSelectedConnectionSlot();
+            }
+
             RefreshAvailableEntityGroups();
 
             dataService.AddHistory("Entitet ID: " + removedEntity.Id + " uklonjen sa mreže.");
+        }
+
+        public void StartOrCompleteConnection(DisplaySlot slot)
+        {
+            if (slot == null || !slot.IsOccupied)
+            {
+                ConnectionInfoText = "Veza se može kreirati samo između zauzetih slotova.";
+                return;
+            }
+
+            if (selectedConnectionSlot == null)
+            {
+                selectedConnectionSlot = slot;
+                ConnectionInfoText = "Izabran prvi entitet ID: " + slot.OccupiedEntity.Id + ". Izaberite drugi entitet.";
+                return;
+            }
+
+            if (selectedConnectionSlot == slot)
+            {
+                ClearSelectedConnectionSlot();
+                ConnectionInfoText = "Kreiranje veze je poništeno.";
+                return;
+            }
+
+            NetworkEntity firstEntity = selectedConnectionSlot.OccupiedEntity;
+            NetworkEntity secondEntity = slot.OccupiedEntity;
+
+            if (ConnectionAlreadyExists(firstEntity, secondEntity))
+            {
+                ClearSelectedConnectionSlot();
+                ConnectionInfoText = "Veza između izabranih entiteta već postoji.";
+                dataService.AddHistory("Pokušaj kreiranja duple veze je odbijen.");
+                return;
+            }
+
+            dataService.Connections.Add(new ConnectionLine(firstEntity, secondEntity));
+
+            dataService.AddHistory(
+                "Kreirana veza između entiteta ID: " +
+                firstEntity.Id + " i ID: " + secondEntity.Id + ".");
+
+            ClearSelectedConnectionSlot();
+
+            ConnectionInfoText = "Veza je uspješno kreirana.";
+        }
+
+        private bool ConnectionAlreadyExists(NetworkEntity firstEntity, NetworkEntity secondEntity)
+        {
+            return dataService.Connections.Any(connection => connection.Connects(firstEntity, secondEntity));
+        }
+
+        private void ClearSelectedConnectionSlot()
+        {
+            selectedConnectionSlot = null;
         }
     }
 }

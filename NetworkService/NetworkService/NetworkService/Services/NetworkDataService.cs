@@ -8,7 +8,7 @@ namespace NetworkService.Services
     public class NetworkDataService
     {
         public ObservableCollection<EntityType> EntityTypes { get; private set; }
-
+        public ObservableCollection<ConnectionLine> Connections { get; private set; }
         public ObservableCollection<DisplaySlot> DisplaySlots { get; private set; }
         public ObservableCollection<NetworkEntity> Entities { get; private set; }
 
@@ -23,7 +23,7 @@ namespace NetworkService.Services
             Measurements = new ObservableCollection<Measurement>();
             HistoryActions = new ObservableCollection<HistoryAction>();
             DisplaySlots = new ObservableCollection<DisplaySlot>();
-
+            Connections = new ObservableCollection<ConnectionLine>();
             LoadEntityTypes();
             LoadInitialEntities();
             LoadDisplaySlots();
@@ -35,6 +35,21 @@ namespace NetworkService.Services
             for (int i = 1; i <= 12; i++)
             {
                 DisplaySlots.Add(new DisplaySlot(i));
+            }
+        }
+        public void RemoveConnectionsForEntity(NetworkEntity entity)
+        {
+            if (entity == null)
+            {
+                return;
+            }
+
+            for (int i = Connections.Count - 1; i >= 0; i--)
+            {
+                if (Connections[i].ContainsEntity(entity))
+                {
+                    Connections.RemoveAt(i);
+                }
             }
         }
         private void LoadEntityTypes()
@@ -87,6 +102,16 @@ namespace NetworkService.Services
             {
                 return;
             }
+
+            foreach (DisplaySlot slot in DisplaySlots)
+            {
+                if (slot.OccupiedEntity == entity)
+                {
+                    slot.RemoveEntity();
+                }
+            }
+
+            RemoveConnectionsForEntity(entity);
 
             Entities.Remove(entity);
             AddHistory("Obrisan entitet ID: " + entity.Id);

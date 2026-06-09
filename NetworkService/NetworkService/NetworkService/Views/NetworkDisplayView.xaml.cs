@@ -1,6 +1,9 @@
-﻿using System.Windows;
+﻿using System.Collections.Specialized;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using NetworkService.Model;
 using NetworkService.ViewModel;
 
@@ -11,10 +14,25 @@ namespace NetworkService.Views
         private bool isDragging;
         private NetworkEntity draggedEntity;
         private DisplaySlot sourceSlot;
+        private NetworkDisplayViewModel subscribedViewModel;
 
         public NetworkDisplayView()
         {
             InitializeComponent();
+
+            Loaded += NetworkDisplayView_Loaded;
+            SizeChanged += NetworkDisplayView_SizeChanged;
+        }
+
+        private void NetworkDisplayView_Loaded(object sender, RoutedEventArgs e)
+        {
+            AttachConnectionsCollection();
+            RedrawConnectionLines();
+        }
+
+        private void NetworkDisplayView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RedrawConnectionLines();
         }
 
         private void EntitiesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -109,8 +127,34 @@ namespace NetworkService.Views
             }
 
             ResetDragState();
+            RedrawConnectionLines();
 
             e.Handled = true;
+        }
+
+        private void ConnectSlotButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+
+            if (button == null)
+            {
+                return;
+            }
+
+            DisplaySlot slot = button.DataContext as DisplaySlot;
+
+            if (slot == null)
+            {
+                return;
+            }
+
+            NetworkDisplayViewModel viewModel = DataContext as NetworkDisplayViewModel;
+
+            if (viewModel != null)
+            {
+                viewModel.StartOrCompleteConnection(slot);
+                RedrawConnectionLines();
+            }
         }
 
         private void RemoveSlotButton_Click(object sender, RoutedEventArgs e)
@@ -134,7 +178,100 @@ namespace NetworkService.Views
             if (viewModel != null)
             {
                 viewModel.RemoveEntityFromSlot(slot);
+                RedrawConnectionLines();
             }
+        }
+
+        private void AttachConnectionsCollection()
+        {
+            NetworkDisplayViewModel viewModel = DataContext as NetworkDisplayViewModel;
+
+            if (subscribedViewModel == viewModel)
+            {
+                return;
+            }
+
+            if (subscribedViewModel != null)
+            {
+                subscribedViewModel.Connections.CollectionChanged -= Connections_CollectionChanged;
+            }
+
+            subscribedViewModel = viewModel;
+
+            if (subscribedViewModel != null)
+            {
+                subscribedViewModel.Connections.CollectionChanged += Connections_CollectionChanged;
+            }
+        }
+
+        private void Connections_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RedrawConnectionLines();
+        }
+
+        private void RedrawConnectionLines()
+        {
+            if (ConnectionsCanvas == null)
+            {
+                return;
+            }
+
+            ConnectionsCanvas.Children.Clear();
+
+            NetworkDisplayViewModel viewModel = DataContext as NetworkDisplayViewModel;
+
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            foreach (ConnectionLine connection in viewModel.Connections)
+            {
+                DisplaySlot firstSlot = FindSlotForEntity(viewModel, connection.FirstEntity);
+                DisplaySlot secondSlot = FindSlotForEntity(viewModel, connection.SecondEntity);
+
+                if (firstSlot == null || secondSlot == null)
+                {
+                    continue;
+                }
+
+                Point firstPoint = GetSlotCenter(firstSlot);
+                Point secondPoint = GetSlotCenter(secondSlot);
+
+                Line line = new Line
+                {
+                    X1 = firstPoint.X,
+                    Y1 = firstPoint.Y,
+                    X2 = secondPoint.X,
+                    Y2 = secondPoint.Y,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 2
+                };
+
+                ConnectionsCanvas.Children.Add(line);
+            }
+        }
+
+        private DisplaySlot FindSlotForEntity(NetworkDisplayViewModel viewModel, NetworkEntity entity)
+        {
+            return viewModel.DisplaySlots.FirstOrDefault(slot => slot.OccupiedEntity == entity);
+        }
+
+        private Point GetSlotCenter(DisplaySlot slot)
+        {
+            FrameworkElement container =
+                DisplaySlotsItemsControl.ItemContainerGenerator.ContainerFromItem(slot) as FrameworkElement;
+
+            if (container == null)
+            {
+                return new Point(0, 0);
+            }
+
+            Point topLeft = container.TransformToVisual(ConnectionsCanvas).Transform(new Point(0, 0));
+
+            return new Point(
+                topLeft.X + container.ActualWidth / 2,
+                topLeft.Y + container.ActualHeight / 2);
         }
 
         private DisplaySlot GetDisplaySlotFromSender(object sender)
