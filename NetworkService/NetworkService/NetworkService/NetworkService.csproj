@@ -55,6 +55,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\BindableBase.cs" />
+    <Compile Include="Helpers\Commands\MyICommand.cs" />
+    <Compile Include="Helpers\Commands\MyICommandWithParameter.cs" />
+    <Compile Include="Helpers\Validations\ValidationBase.cs" />
+    <Compile Include="Helpers\Validations\ValidationErrors.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
