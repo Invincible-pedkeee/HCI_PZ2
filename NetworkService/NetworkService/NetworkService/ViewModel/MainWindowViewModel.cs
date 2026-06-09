@@ -17,8 +17,19 @@ namespace NetworkService.ViewModel
         private readonly NetworkDisplayViewModel networkDisplayViewModel;
         private readonly MeasurementGraphViewModel measurementGraphViewModel;
 
+
+
         public ToastNotificationService ToastService { get; private set; }
         public MyICommandWithParameter<string> NavigationCommand { get; private set; }
+
+
+        public MyICommand GlobalAddCommand { get; private set; }
+
+        public MyICommand GlobalDeleteCommand { get; private set; }
+
+        public MyICommand GlobalUndoCommand { get; private set; }
+
+        public MyICommand GlobalUndoAllCommand { get; private set; }
 
         public BindableBase CurrentViewModel
         {
@@ -99,6 +110,13 @@ namespace NetworkService.ViewModel
             networkDisplayViewModel = new NetworkDisplayViewModel(dataService, ToastService);
             measurementGraphViewModel = new MeasurementGraphViewModel(dataService);
 
+
+            NavigationCommand = new MyICommandWithParameter<string>(OnNavigate);
+            GlobalAddCommand = new MyICommand(OnGlobalAdd);
+            GlobalDeleteCommand = new MyICommand(OnGlobalDelete);
+            GlobalUndoCommand = new MyICommand(OnGlobalUndo);
+            GlobalUndoAllCommand = new MyICommand(OnGlobalUndoAll);
+
             meteringReceiverService = new MeteringReceiverService(
             GetEntityCount,
             OnMeasurementReceived,
@@ -131,6 +149,102 @@ namespace NetworkService.ViewModel
                 CurrentViewModel = measurementGraphViewModel;
                 StatusMessage = "Prikazan grafikon mjerenja.";
             }
+
+        }
+        private void OnGlobalAdd()
+        {
+            if (CurrentViewModel == networkEntitiesViewModel)
+            {
+                networkEntitiesViewModel.AddEntityCommand.Execute(null);
+                return;
+            }
+
+            ToastService.ShowInfo("Dodavanje entiteta je dostupno samo na prikazu Entiteti mreže.");
+        }
+
+        private void OnGlobalDelete()
+        {
+            if (CurrentViewModel == networkEntitiesViewModel)
+            {
+                if (networkEntitiesViewModel.RequestDeleteEntityCommand.CanExecute(null))
+                {
+                    networkEntitiesViewModel.RequestDeleteEntityCommand.Execute(null);
+                }
+                else
+                {
+                    ToastService.ShowWarning("Prvo selektujte entitet koji želite da obrišete.");
+                }
+
+                return;
+            }
+
+            ToastService.ShowInfo("Brisanje selektovanog entiteta je dostupno samo na prikazu Entiteti mreže.");
+        }
+
+        private void OnGlobalUndo()
+        {
+            if (CurrentViewModel == networkEntitiesViewModel)
+            {
+                if (networkEntitiesViewModel.UndoCommand.CanExecute(null))
+                {
+                    networkEntitiesViewModel.UndoCommand.Execute(null);
+                }
+                else
+                {
+                    ToastService.ShowInfo("Nema akcija za poništavanje na prikazu Entiteti mreže.");
+                }
+
+                return;
+            }
+
+            if (CurrentViewModel == networkDisplayViewModel)
+            {
+                if (networkDisplayViewModel.UndoCommand.CanExecute(null))
+                {
+                    networkDisplayViewModel.UndoCommand.Execute(null);
+                }
+                else
+                {
+                    ToastService.ShowInfo("Nema akcija za poništavanje na prikazu mreže.");
+                }
+
+                return;
+            }
+
+            ToastService.ShowInfo("Undo nije dostupan na prikazu grafikona.");
+        }
+
+        private void OnGlobalUndoAll()
+        {
+            if (CurrentViewModel == networkEntitiesViewModel)
+            {
+                if (networkEntitiesViewModel.UndoAllCommand.CanExecute(null))
+                {
+                    networkEntitiesViewModel.UndoAllCommand.Execute(null);
+                }
+                else
+                {
+                    ToastService.ShowInfo("Nema akcija za poništavanje na prikazu Entiteti mreže.");
+                }
+
+                return;
+            }
+
+            if (CurrentViewModel == networkDisplayViewModel)
+            {
+                if (networkDisplayViewModel.UndoAllCommand.CanExecute(null))
+                {
+                    networkDisplayViewModel.UndoAllCommand.Execute(null);
+                }
+                else
+                {
+                    ToastService.ShowInfo("Nema akcija za poništavanje na prikazu mreže.");
+                }
+
+                return;
+            }
+
+            ToastService.ShowInfo("Undo All nije dostupan na prikazu grafikona.");
         }
     }
 }

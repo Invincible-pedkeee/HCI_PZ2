@@ -27,6 +27,32 @@
             <views:MeasurementGraphView/>
         </DataTemplate>
     </Window.Resources>
+    
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+1"
+                Command="{Binding NavigationCommand}"
+                CommandParameter="entities"/>
+
+        <KeyBinding Gesture="Ctrl+2"
+                Command="{Binding NavigationCommand}"
+                CommandParameter="display"/>
+
+        <KeyBinding Gesture="Ctrl+3"
+                Command="{Binding NavigationCommand}"
+                CommandParameter="graph"/>
+
+        <KeyBinding Gesture="Ctrl+N"
+                Command="{Binding GlobalAddCommand}"/>
+
+        <KeyBinding Gesture="Delete"
+                Command="{Binding GlobalDeleteCommand}"/>
+
+        <KeyBinding Gesture="Ctrl+Z"
+                Command="{Binding GlobalUndoCommand}"/>
+
+        <KeyBinding Gesture="Ctrl+Shift+Z"
+                Command="{Binding GlobalUndoAllCommand}"/>
+    </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
