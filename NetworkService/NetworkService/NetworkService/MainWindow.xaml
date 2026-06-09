@@ -13,6 +13,8 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <DataTemplate DataType="{x:Type viewModel:NetworkEntitiesViewModel}">
             <views:NetworkEntitiesView/>
         </DataTemplate>
@@ -87,6 +89,32 @@
             <TextBlock Text="{Binding StatusMessage}"
                        VerticalAlignment="Center"
                        Margin="12,0,0,0"/>
+        </Border>
+
+        <!-- Toast notification -->
+        <Border Grid.RowSpan="3"
+                Width="340"
+                MinHeight="86"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,24,48"
+                Padding="14"
+                Background="{Binding ToastService.BackgroundColor}"
+                BorderBrush="{Binding ToastService.BorderColor}"
+                BorderThickness="2"
+                Visibility="{Binding ToastService.IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Panel.ZIndex="1000">
+
+            <StackPanel>
+                <TextBlock Text="{Binding ToastService.Title}"
+                           FontWeight="SemiBold"
+                           FontSize="13"
+                           Margin="0,0,0,6"/>
+
+                <TextBlock Text="{Binding ToastService.Message}"
+                           TextWrapping="Wrap"
+                           FontSize="12"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

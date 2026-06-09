@@ -13,6 +13,7 @@ namespace NetworkService.ViewModel
     {
         private readonly NetworkDataService dataService;
         private readonly Stack<UndoAction> undoActions;
+        private readonly ToastNotificationService toastService;
 
         private ObservableCollection<EntitiesByType> availableEntityGroups;
         private DisplaySlot selectedConnectionSlot;
@@ -70,9 +71,10 @@ namespace NetworkService.ViewModel
 
         public MyICommand UndoAllCommand { get; private set; }
 
-        public NetworkDisplayViewModel(NetworkDataService dataService)
+        public NetworkDisplayViewModel(NetworkDataService dataService, ToastNotificationService toastService)
         {
             this.dataService = dataService;
+            this.toastService = toastService;
             undoActions = new Stack<UndoAction>();
 
             UndoCommand = new MyICommand(OnUndo, CanUndo);
@@ -131,6 +133,7 @@ namespace NetworkService.ViewModel
             RefreshAvailableEntityGroups();
 
             dataService.AddHistory("Entitet ID: " + entity.Id + " postavljen na mrežu, slot " + slot.SlotNumber + ".");
+            toastService.ShowSuccess("Entitet ID: " + entity.Id + " je postavljen na mrežu.");
         }
 
         public void MoveEntityBetweenSlots(DisplaySlot sourceSlot, DisplaySlot targetSlot)
@@ -179,6 +182,7 @@ namespace NetworkService.ViewModel
                 "Entitet ID: " + entity.Id +
                 " premješten sa slota " + sourceSlotNumber +
                 " na slot " + targetSlotNumber + ".");
+            toastService.ShowInfo("Entitet ID: " + entity.Id + " je premješten na drugi slot.");
         }
 
         public void RemoveEntityFromSlot(DisplaySlot slot)
@@ -221,6 +225,7 @@ namespace NetworkService.ViewModel
             RefreshAvailableEntityGroups();
 
             dataService.AddHistory("Entitet ID: " + removedEntity.Id + " uklonjen sa mreže.");
+            toastService.ShowSuccess("Entitet ID: " + removedEntity.Id + " je uklonjen sa mreže.");
         }
 
         public void StartOrCompleteConnection(DisplaySlot slot)
@@ -253,6 +258,7 @@ namespace NetworkService.ViewModel
                 ClearSelectedConnectionSlot();
                 ConnectionInfoText = "Veza između izabranih entiteta već postoji.";
                 dataService.AddHistory("Pokušaj kreiranja duple veze je odbijen.");
+                toastService.ShowWarning("Veza između ovih entiteta već postoji.");
                 return;
             }
 
@@ -269,6 +275,7 @@ namespace NetworkService.ViewModel
             dataService.AddHistory(
                 "Kreirana veza između entiteta ID: " +
                 firstEntity.Id + " i ID: " + secondEntity.Id + ".");
+            toastService.ShowSuccess("Kreirana je veza između entiteta ID: " + firstEntity.Id + " i ID: " + secondEntity.Id + ".");
 
             ClearSelectedConnectionSlot();
 
@@ -291,7 +298,7 @@ namespace NetworkService.ViewModel
             undoAction.Execute();
 
             dataService.AddHistory("Undo izvršen na prikazu mreže: " + undoAction.Description);
-
+            toastService.ShowInfo("Poništena je poslednja akcija na prikazu mreže.");
             RefreshUndoCommands();
         }
 
@@ -311,7 +318,7 @@ namespace NetworkService.ViewModel
             }
 
             dataService.AddHistory("Undo All izvršen na prikazu mreže. Broj poništenih akcija: " + actionCount);
-
+            toastService.ShowInfo("Poništene su sve akcije na prikazu mreže.");
             RefreshUndoCommands();
         }
 

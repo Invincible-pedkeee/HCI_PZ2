@@ -17,6 +17,7 @@ namespace NetworkService.ViewModel
         private readonly NetworkDisplayViewModel networkDisplayViewModel;
         private readonly MeasurementGraphViewModel measurementGraphViewModel;
 
+        public ToastNotificationService ToastService { get; private set; }
         public MyICommandWithParameter<string> NavigationCommand { get; private set; }
 
         public BindableBase CurrentViewModel
@@ -91,9 +92,11 @@ namespace NetworkService.ViewModel
         public MainWindowViewModel()
         {
             dataService = new NetworkDataService();
+            ToastService = new ToastNotificationService();
 
-            networkEntitiesViewModel = new NetworkEntitiesViewModel(dataService);
-            networkDisplayViewModel = new NetworkDisplayViewModel(dataService);
+
+            networkEntitiesViewModel = new NetworkEntitiesViewModel(dataService, ToastService);
+            networkDisplayViewModel = new NetworkDisplayViewModel(dataService, ToastService);
             measurementGraphViewModel = new MeasurementGraphViewModel(dataService);
 
             meteringReceiverService = new MeteringReceiverService(

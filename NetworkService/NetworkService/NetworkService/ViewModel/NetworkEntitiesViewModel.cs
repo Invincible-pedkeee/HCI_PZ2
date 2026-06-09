@@ -14,6 +14,8 @@ namespace NetworkService.ViewModel
         private readonly NetworkDataService dataService;
         private readonly Stack<UndoAction> undoActions;
 
+        private readonly ToastNotificationService toastService;
+
         private NetworkEntityInput currentEntityInput;
         private NetworkEntity selectedEntity;
         private bool isDeleteDialogVisible;
@@ -187,9 +189,11 @@ namespace NetworkService.ViewModel
 
         public MyICommand UndoAllCommand { get; private set; }
 
-        public NetworkEntitiesViewModel(NetworkDataService dataService)
+        public NetworkEntitiesViewModel(NetworkDataService dataService, ToastNotificationService toastService)
         {
             this.dataService = dataService;
+            this.toastService = toastService;
+
             undoActions = new Stack<UndoAction>();
 
             CurrentEntityInput = new NetworkEntityInput(dataService.Entities);
@@ -232,6 +236,7 @@ namespace NetworkService.ViewModel
             if (!CurrentEntityInput.IsValid)
             {
                 dataService.AddHistory("Dodavanje entiteta nije uspjelo zbog neispravnog unosa.");
+                toastService.ShowWarning("Dodavanje nije izvršeno. Provjerite unesena polja.");
                 return;
             }
 
@@ -245,6 +250,8 @@ namespace NetworkService.ViewModel
                 0);
 
             dataService.AddEntity(entity);
+            toastService.ShowSuccess("Dodat je entitet ID: " + entity.Id + ".");
+
 
             RegisterUndoAction(new UndoAction(
                 "dodavanje entiteta ID: " + entity.Id,
@@ -281,6 +288,7 @@ namespace NetworkService.ViewModel
             int originalIndex = dataService.Entities.IndexOf(entityToDelete);
 
             dataService.DeleteEntity(entityToDelete);
+            toastService.ShowSuccess("Obrisan je entitet ID: " + entityToDelete.Id + ".");
 
             RegisterUndoAction(new UndoAction(
                 "brisanje entiteta ID: " + entityToDelete.Id,
@@ -324,6 +332,7 @@ namespace NetworkService.ViewModel
                 }));
 
             dataService.AddHistory("Primijenjen filter nad tabelom entiteta.");
+            toastService.ShowInfo("Filter je primijenjen.");
         }
 
         private void OnClearFilter()
@@ -348,6 +357,7 @@ namespace NetworkService.ViewModel
                 }));
 
             dataService.AddHistory("Poništeni svi filteri u tabeli entiteta.");
+            toastService.ShowInfo("Filteri su poništeni.");
         }
 
         private bool CanUndo()
@@ -366,7 +376,7 @@ namespace NetworkService.ViewModel
             undoAction.Execute();
 
             dataService.AddHistory("Undo izvršen: " + undoAction.Description);
-
+            toastService.ShowInfo("Filteri su poništeni.");
             RefreshUndoCommands();
         }
 
@@ -386,7 +396,7 @@ namespace NetworkService.ViewModel
             }
 
             dataService.AddHistory("Undo All izvršen. Broj poništenih akcija: " + numberOfActions);
-
+            toastService.ShowInfo("Poništene su sve akcije na prikazu entiteta.");
             RefreshUndoCommands();
         }
 
