@@ -60,6 +60,10 @@
     <Compile Include="Helpers\Commands\MyICommandWithParameter.cs" />
     <Compile Include="Helpers\Validations\ValidationBase.cs" />
     <Compile Include="Helpers\Validations\ValidationErrors.cs" />
+    <Compile Include="Model\EntityType.cs" />
+    <Compile Include="Model\HistoryAction.cs" />
+    <Compile Include="Model\Measurement.cs" />
+    <Compile Include="Model\NetworkEntity.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -101,7 +105,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
     <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
