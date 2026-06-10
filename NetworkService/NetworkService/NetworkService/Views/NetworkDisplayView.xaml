@@ -7,19 +7,19 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="White">
+    <Grid Background="#FFFFFF">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="255"/>
+            <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
         <!-- LEFT TREEVIEW -->
         <Border Grid.Column="0"
-                Background="#F2F2F2"
-                BorderBrush="#C8C8C8"
+                Background="{StaticResource PanelBgBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}"
                 BorderThickness="0,0,1,0"
-                Padding="14">
+                Padding="18">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -28,76 +28,97 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="DOSTUPNI ENTITETI"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                           Style="{StaticResource SectionHeader}"
+                           Margin="0,0,0,12"/>
 
-                <TreeView x:Name="EntitiesTreeView"
-                          Grid.Row="1"
-                          ItemsSource="{Binding AvailableEntityGroups}"
-                          SelectedItemChanged="EntitiesTreeView_SelectedItemChanged"
-                          MouseLeftButtonUp="EntitiesTreeView_MouseLeftButtonUp"
-                          ToolTip="Drag road entities from this tree to the display grid">
+                <Border Grid.Row="1"
+                        Background="{StaticResource CardBgBrush}"
+                        BorderBrush="{StaticResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="8"
+                        Effect="{StaticResource SoftShadow}">
 
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type model:EntitiesByType}"
-                                                  ItemsSource="{Binding Entities}">
-                            <TextBlock FontWeight="SemiBold"
-                                       Text="{Binding TypeName}"/>
-                        </HierarchicalDataTemplate>
+                    <TreeView x:Name="EntitiesTreeView"
+                              ItemsSource="{Binding AvailableEntityGroups}"
+                              SelectedItemChanged="EntitiesTreeView_SelectedItemChanged"
+                              MouseLeftButtonUp="EntitiesTreeView_MouseLeftButtonUp"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              ToolTip="Drag road entities from this tree to the display grid">
 
-                        <DataTemplate DataType="{x:Type model:NetworkEntity}">
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="0,4,0,4">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type model:EntitiesByType}"
+                                                      ItemsSource="{Binding Entities}">
+                                <TextBlock FontWeight="SemiBold"
+                                           FontSize="13"
+                                           Foreground="{StaticResource TextBrush}"
+                                           Text="{Binding TypeName}"/>
+                            </HierarchicalDataTemplate>
 
-                                <Image Source="{Binding Type.ImagePath}"
-                                       Width="30"
-                                       Height="30"
-                                       Margin="0,0,8,0"
-                                       VerticalAlignment="Center"/>
+                            <DataTemplate DataType="{x:Type model:NetworkEntity}">
+                                <Border Background="Transparent"
+                                        CornerRadius="6"
+                                        Padding="4"
+                                        Margin="0,2">
+                                    <StackPanel Orientation="Horizontal">
 
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock FontWeight="SemiBold"
-                                               Text="{Binding Name}"/>
+                                        <Image Source="{Binding Type.ImagePath}"
+                                               Width="30"
+                                               Height="30"
+                                               Margin="0,0,10,0"
+                                               VerticalAlignment="Center"/>
 
-                                    <TextBlock FontSize="11"
-                                               Foreground="Gray">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} | ID: {1}">
-                                                <Binding Path="Type.Name"/>
-                                                <Binding Path="Id"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
+                                        <StackPanel Orientation="Vertical"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock FontWeight="SemiBold"
+                                                       FontSize="13"
+                                                       Text="{Binding Name}"/>
+
+                                            <TextBlock FontSize="11"
+                                                       Foreground="{StaticResource TextMutedBrush}">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} | ID: {1}">
+                                                        <Binding Path="Type.Name"/>
+                                                        <Binding Path="Id"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </Border>
             </Grid>
         </Border>
 
         <!-- CENTER DISPLAY GRID -->
         <Grid Grid.Column="1"
-              Margin="16">
+              Margin="20">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0">
+            <StackPanel Grid.Row="0"
+                        Margin="0,0,0,14">
                 <TextBlock Text="PRIKAZ MREŽE"
-                           FontSize="13"
+                           FontSize="15"
                            FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"
                            Margin="0,0,0,4"/>
 
                 <TextBlock Text="{Binding ConnectionInfoText}"
-                           FontSize="11"
-                           Foreground="Gray"
-                           Margin="0,0,0,8"/>
+                           FontSize="12"
+                           Foreground="{StaticResource TextMutedBrush}"/>
             </StackPanel>
 
+            <!-- IMPORTANT: ItemsControl and ConnectionsCanvas must remain the
+                 two direct children of this single Grid cell so the connection
+                 lines are computed in the same coordinate space. -->
             <Grid Grid.Row="1">
 
                 <ItemsControl x:Name="DisplaySlotsItemsControl"
@@ -112,9 +133,10 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="6"
-                                    Padding="10"
-                                    BorderBrush="#A8A8A8"
+                            <Border Margin="7"
+                                    Padding="12"
+                                    CornerRadius="10"
+                                    BorderBrush="#D4DAE3"
                                     BorderThickness="1"
                                     AllowDrop="True"
                                     MouseLeftButtonDown="DisplaySlot_MouseLeftButtonDown"
@@ -123,16 +145,17 @@
 
                                 <Border.Style>
                                     <Style TargetType="Border">
-                                        <Setter Property="Background" Value="#FAFAFA"/>
+                                        <Setter Property="Background" Value="#FBFCFE"/>
 
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsOccupied}" Value="True">
-                                                <Setter Property="Background" Value="#EEF5FF"/>
+                                                <Setter Property="Background" Value="#EAF1FF"/>
+                                                <Setter Property="BorderBrush" Value="#B9CDF2"/>
                                             </DataTrigger>
 
                                             <DataTrigger Binding="{Binding IsValueInvalid}" Value="True">
-                                                <Setter Property="Background" Value="#FFE3E3"/>
-                                                <Setter Property="BorderBrush" Value="#AA0000"/>
+                                                <Setter Property="Background" Value="#FCE9E9"/>
+                                                <Setter Property="BorderBrush" Value="#D64545"/>
                                                 <Setter Property="BorderThickness" Value="2"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -149,6 +172,8 @@
                                     <TextBlock Grid.Row="0"
                                                Text="{Binding TitleText}"
                                                FontWeight="SemiBold"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextBrush}"
                                                TextWrapping="Wrap"/>
 
                                     <StackPanel Grid.Row="1"
@@ -164,13 +189,15 @@
                                         <TextBlock Text="{Binding DetailsText}"
                                                    TextWrapping="Wrap"
                                                    TextAlignment="Center"
+                                                   Foreground="{StaticResource TextMutedBrush}"
                                                    FontSize="12"/>
 
                                         <TextBlock Text="{Binding StatusText}"
                                                    TextWrapping="Wrap"
                                                    TextAlignment="Center"
                                                    FontSize="12"
-                                                   Margin="0,8,0,0"/>
+                                                   FontWeight="SemiBold"
+                                                   Margin="0,6,0,0"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="2"
@@ -179,15 +206,17 @@
                                                 Margin="0,8,0,0">
 
                                         <Button Content="Poveži"
-                                                Width="65"
-                                                Height="24"
+                                                Style="{StaticResource SlotButton}"
+                                                Width="66"
+                                                Height="26"
                                                 Click="ConnectSlotButton_Click"
                                                 Cursor="Hand"
                                                 ToolTip="Create connection with another occupied slot"/>
 
                                         <Button Content="Ukloni"
-                                                Width="65"
-                                                Height="24"
+                                                Style="{StaticResource SlotButtonDanger}"
+                                                Width="66"
+                                                Height="26"
                                                 Margin="6,0,0,0"
                                                 Click="RemoveSlotButton_Click"
                                                 Cursor="Hand"
@@ -208,10 +237,10 @@
 
         <!-- RIGHT HISTORY PANEL -->
         <Border Grid.Column="2"
-                Background="#F2F2F2"
-                BorderBrush="#C8C8C8"
+                Background="{StaticResource PanelBgBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}"
                 BorderThickness="1,0,0,0"
-                Padding="14">
+                Padding="18">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -222,25 +251,31 @@
 
                 <TextBlock Grid.Row="0"
                            Text="ISTORIJA IZVRŠENIH AKCIJA"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                           Style="{StaticResource SectionHeader}"
+                           Margin="0,0,0,12"/>
 
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding HistoryActions}"
-                         FontSize="11"/>
+                         FontSize="11">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"
+                                       TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
                 <StackPanel Grid.Row="2"
-                            Margin="0,12,0,0">
+                            Margin="0,14,0,0">
 
                     <Button Content="Poništi poslednju akciju"
-                            Height="28"
+                            Height="32"
                             Command="{Binding UndoCommand}"
                             Cursor="Hand"
                             ToolTip="Undo last action on Network Display View"/>
 
                     <Button Content="Poništi sve akcije"
-                            Height="28"
+                            Height="32"
                             Margin="0,8,0,0"
                             Command="{Binding UndoAllCommand}"
                             Cursor="Hand"
