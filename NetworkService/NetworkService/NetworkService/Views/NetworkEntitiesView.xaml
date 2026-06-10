@@ -6,136 +6,198 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="White">
+    <Grid Background="#FFFFFF">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="285"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="255"/>
+            <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
         <!-- LEFT PANEL -->
         <Border Grid.Column="0"
-                Background="#F2F2F2"
-                BorderBrush="#C8C8C8"
-                BorderThickness="0,0,1,0"
-                Padding="14">
+                Background="{StaticResource PanelBgBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}"
+                BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Padding="18,18,18,18">
+                <StackPanel>
 
-            <StackPanel>
-                <TextBlock Text="DODAVANJE NOVOG ENTITETA"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                    <!-- ====== DODAVANJE NOVOG ENTITETA ====== -->
+                    <TextBlock Text="DODAVANJE NOVOG ENTITETA"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,0,0,12"/>
 
-                <Separator Margin="0,0,0,10"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Effect="{StaticResource SoftShadow}">
+                        <StackPanel>
+                            <TextBox Height="32"
+                                     Text="{Binding CurrentEntityInput.IdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Unesite jedinstveni ID puta (cijeli broj)"/>
 
-                <TextBox Height="28"
-                         Text="{Binding CurrentEntityInput.IdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip="Enter unique road ID"/>
+                            <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[IdText]}"
+                                       Style="{StaticResource ValidationText}"
+                                       Margin="0,3,0,8"/>
 
-                <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[IdText]}"
-                           Foreground="DarkRed"
-                           FontSize="11"
-                           Margin="0,3,0,10"/>
+                            <TextBox Height="32"
+                                     Text="{Binding CurrentEntityInput.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Unesite naziv puta (npr. Autoput E75)"/>
 
-                <TextBox Height="28"
-                         Text="{Binding CurrentEntityInput.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip="Enter road name"/>
+                            <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[Name]}"
+                                       Style="{StaticResource ValidationText}"
+                                       Margin="0,3,0,8"/>
 
-                <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[Name]}"
-                           Foreground="DarkRed"
-                           FontSize="11"
-                           Margin="0,3,0,10"/>
+                            <ComboBox Height="32"
+                                      ItemsSource="{Binding EntityTypes}"
+                                      SelectedItem="{Binding CurrentEntityInput.SelectedType, Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      ToolTip="Izaberite tip puta: IA ili IB"/>
 
-                <ComboBox Height="28"
-                          ItemsSource="{Binding EntityTypes}"
-                          SelectedItem="{Binding CurrentEntityInput.SelectedType, Mode=TwoWay}"
-                          DisplayMemberPath="Name"
-                          ToolTip="Select road type"/>
+                            <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[SelectedType]}"
+                                       Style="{StaticResource ValidationText}"
+                                       Margin="0,3,0,12"/>
 
-                <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[SelectedType]}"
-                           Foreground="DarkRed"
-                           FontSize="11"
-                           Margin="0,3,0,12"/>
+                            <Button Content="[+] DODAJ U SISTEM"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Height="34"
+                                    Command="{Binding AddEntityCommand}"
+                                    Cursor="Hand"
+                                    ToolTip="Dodaj novi put u sistem za monitoring"/>
+                        </StackPanel>
+                    </Border>
 
-                <Button Content="[+] DODAJ U SISTEM"
-                        Height="30"
-                        Command="{Binding AddEntityCommand}"
-                        Cursor="Hand"
-                        ToolTip="Add new road entity"/>
+                    <!-- ====== PRETRAGA I FILTER ====== -->
+                    <TextBlock Text="PRETRAGA I FILTER"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,24,0,12"/>
 
-                <Separator Margin="0,24,0,12"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Effect="{StaticResource SoftShadow}">
+                        <StackPanel>
+                            <TextBlock Text="Tip puta"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,4"/>
 
-                <TextBlock Text="FILTER ENTITETA"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                            <ComboBox Height="32"
+                                      ItemsSource="{Binding EntityTypes}"
+                                      SelectedItem="{Binding SelectedFilterType, Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      ToolTip="Filtriraj po tipu puta: IA ili IB"/>
 
-                <TextBlock Text="Tip puta"
-                           FontSize="11"
-                           Margin="0,0,0,3"/>
+                            <!-- ID comparison as RadioButton group via ListBox -->
+                            <ListBox ItemsSource="{Binding IdComparisonOptions}"
+                                     SelectedItem="{Binding SelectedIdComparison, Mode=TwoWay}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Margin="0,12,0,0">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <RadioButton Content="{Binding}"
+                                                                 IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                                                                 GroupName="IdComparison"
+                                                                 Margin="0,0,14,0"
+                                                                 VerticalContentAlignment="Center"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
 
-                <ComboBox Height="28"
-                          ItemsSource="{Binding EntityTypes}"
-                          SelectedItem="{Binding SelectedFilterType, Mode=TwoWay}"
-                          DisplayMemberPath="Name"
-                          ToolTip="Filter roads by type IA or IB"/>
+                            <TextBlock Text="{Binding FilterComparisonError}"
+                                       Style="{StaticResource ValidationText}"
+                                       Margin="0,3,0,6"/>
 
-                <TextBlock Text="ID uslov"
-                           FontSize="11"
-                           Margin="0,10,0,3"/>
+                            <TextBox Height="32"
+                                     Text="{Binding FilterIdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Unesite ID vrijednost za filtriranje"/>
 
-                <ComboBox Height="28"
-                          ItemsSource="{Binding IdComparisonOptions}"
-                          SelectedItem="{Binding SelectedIdComparison, Mode=TwoWay}"
-                          ToolTip="Select ID comparison operator"/>
+                            <TextBlock Text="{Binding FilterIdError}"
+                                       Style="{StaticResource ValidationText}"
+                                       Margin="0,3,0,0"/>
 
-                <TextBlock Text="{Binding FilterComparisonError}"
-                           Foreground="DarkRed"
-                           FontSize="11"
-                           Margin="0,3,0,6"/>
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                <TextBox Height="28"
-                         Text="{Binding FilterIdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip="Enter ID value for filtering"/>
+                                <Button Grid.Column="0"
+                                        Content="Primijeni"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Height="32"
+                                        Command="{Binding ApplyFilterCommand}"
+                                        Cursor="Hand"
+                                        ToolTip="Primijeni izabrane filtere na tabelu"/>
 
-                <TextBlock Text="{Binding FilterIdError}"
-                           Foreground="DarkRed"
-                           FontSize="11"
-                           Margin="0,3,0,8"/>
+                                <Button Grid.Column="2"
+                                        Content="Poništi"
+                                        Height="32"
+                                        Command="{Binding ClearFilterCommand}"
+                                        Cursor="Hand"
+                                        ToolTip="Poništi sve filtere i prikaži sve entitete"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
 
-                <TextBlock Text="Status poslednjeg mjerenja"
-                           FontSize="11"
-                           Margin="0,0,0,3"/>
+                    <!-- ====== DODATNI FILTER STANJA ====== -->
+                    <TextBlock Text="DODATNI FILTER STANJA"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,24,0,12"/>
 
-                <ComboBox Height="28"
-                          ItemsSource="{Binding StatusFilterOptions}"
-                          SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
-                          ToolTip="Filter by valid or invalid last measured value"/>
+                    <Border Background="{StaticResource CardBgBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Effect="{StaticResource SoftShadow}">
 
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,14,0,0">
+                        <!-- Status filter as RadioButton group via ListBox -->
+                        <ListBox ItemsSource="{Binding StatusFilterOptions}"
+                                 SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 BorderThickness="0">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <RadioButton Content="{Binding}"
+                                                             IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                                                             GroupName="StatusFilter"
+                                                             Margin="0,0,0,6"
+                                                             VerticalContentAlignment="Center"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Border>
 
-                    <Button Content="PRIMIJENI"
-                            Width="105"
-                            Height="28"
-                            Command="{Binding ApplyFilterCommand}"
-                            Cursor="Hand"
-                            ToolTip="Apply selected filters"/>
-
-                    <Button Content="RESET"
-                            Width="90"
-                            Height="28"
-                            Margin="8,0,0,0"
-                            Command="{Binding ClearFilterCommand}"
-                            Cursor="Hand"
-                            ToolTip="Clear all filters"/>
                 </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </Border>
 
         <!-- CENTER TABLE -->
         <Grid Grid.Column="1"
-              Margin="16">
+              Margin="20">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -144,159 +206,197 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="ENTITETI MREŽE"
-                       FontSize="13"
+                       FontSize="15"
                        FontWeight="SemiBold"
-                       Margin="0,0,0,10"/>
+                       Foreground="{StaticResource TextBrush}"
+                       Margin="0,0,0,12"/>
 
-            <DataGrid Grid.Row="1"
-                      ItemsSource="{Binding FilteredEntities}"
-                      SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      SelectionMode="Single"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="All"
-                      ToolTip="Table of all monitored road entities">
+            <Border Grid.Row="1"
+                    Background="{StaticResource CardBgBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="1"
+                    Effect="{StaticResource SoftShadow}">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID"
-                                        Binding="{Binding Id}"
-                                        Width="55"/>
+                <DataGrid ItemsSource="{Binding FilteredEntities}"
+                          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          ToolTip="Tabela svih monitorisanih puteva u sistemu">
 
-                    <DataGridTemplateColumn Header="Slika"
-                                            Width="70">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image Source="{Binding Type.ImagePath}"
-                                       Width="34"
-                                       Height="34"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                            Binding="{Binding Id}"
+                                            Width="55"/>
 
-                    <DataGridTextColumn Header="Naziv"
-                                        Binding="{Binding Name}"
-                                        Width="*"/>
+                        <DataGridTemplateColumn Header="Slika"
+                                                Width="70">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding Type.ImagePath}"
+                                           Width="34"
+                                           Height="34"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="Tip"
-                                        Binding="{Binding Type.Name}"
-                                        Width="70"/>
+                        <DataGridTextColumn Header="Naziv"
+                                            Binding="{Binding Name}"
+                                            Width="*"/>
 
-                    <DataGridTextColumn Header="Poslednja vrednost"
-                                        Binding="{Binding LastValue}"
-                                        Width="145"/>
+                        <DataGridTextColumn Header="Tip"
+                                            Binding="{Binding Type.Name}"
+                                            Width="70"/>
 
-                    <DataGridTextColumn Header="Status"
-                                        Binding="{Binding Status}"
-                                        Width="135"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                        <DataGridTextColumn Header="Poslednja vrednost"
+                                            Binding="{Binding LastValue}"
+                                            Width="145"/>
+
+                        <DataGridTemplateColumn Header="Status"
+                                                Width="135">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Status}"
+                                               Style="{StaticResource StatusCellText}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
 
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Margin="0,12,0,0">
-
-                <Button Content="UNDO"
-                        Width="90"
-                        Height="30"
-                        Command="{Binding UndoCommand}"
-                        Cursor="Hand"
-                        ToolTip="Undo last action on Network Entities View"/>
-
-                <Button Content="UNDO ALL"
-                        Width="100"
-                        Height="30"
-                        Margin="8,0,0,0"
-                        Command="{Binding UndoAllCommand}"
-                        Cursor="Hand"
-                        ToolTip="Undo all actions on Network Entities View"/>
+                        Margin="0,14,0,0">
 
                 <Button Content="[-] OBRIŠI SELEKTOVANO"
-                        Width="170"
-                        Height="30"
-                        Margin="8,0,0,0"
+                        Style="{StaticResource DangerButton}"
+                        Width="200"
+                        Height="34"
                         Command="{Binding RequestDeleteEntityCommand}"
                         Cursor="Hand"
-                        ToolTip="Delete selected road entity"/>
+                        ToolTip="Obriši selektovani entitet iz sistema"/>
             </StackPanel>
         </Grid>
 
         <!-- RIGHT HISTORY PANEL -->
         <Border Grid.Column="2"
-                Background="#F2F2F2"
-                BorderBrush="#C8C8C8"
+                Background="{StaticResource PanelBgBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}"
                 BorderThickness="1,0,0,0"
-                Padding="14">
+                Padding="18">
 
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="ISTORIJA IZVRŠENIH AKCIJA"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                <TextBlock Grid.Row="0"
+                           Text="ISTORIJA IZVRŠENIH AKCIJA"
+                           Style="{StaticResource SectionHeader}"
+                           Margin="0,0,0,12"/>
 
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding HistoryActions}"
-                         FontSize="11"/>
+                         FontSize="11">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"
+                                       TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2"
+                            Margin="0,14,0,0">
+
+                    <Button Content="Poništi poslednju akciju"
+                            Height="32"
+                            Command="{Binding UndoCommand}"
+                            Cursor="Hand"
+                            ToolTip="Poništi poslednju izvršenu akciju (Ctrl+Z)"/>
+
+                    <Button Content="Poništi sve akcije"
+                            Height="32"
+                            Margin="0,8,0,0"
+                            Command="{Binding UndoAllCommand}"
+                            Cursor="Hand"
+                            ToolTip="Poništi sve do sad izvršene akcije (Ctrl+Shift+Z)"/>
+                </StackPanel>
             </Grid>
         </Border>
 
         <!-- CUSTOM DELETE CONFIRMATION OVERLAY -->
         <Grid Grid.ColumnSpan="3"
-              Background="#80000000"
+              Background="#80101826"
               Visibility="{Binding IsDeleteDialogVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
 
-            <Border Width="420"
-                    Height="190"
+            <Border Width="440"
                     Background="White"
-                    BorderBrush="Black"
-                    BorderThickness="2"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Padding="24">
+                    Padding="26"
+                    Effect="{StaticResource SoftShadow}">
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,0,14">
+                        <Border Width="34" Height="34"
+                                CornerRadius="17"
+                                Background="{StaticResource DangerSoftBgBrush}"
+                                Margin="0,0,12,0">
+                            <TextBlock Text="!"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DangerBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="POTVRDA AKCIJE: UKLANJANJE ENTITETA"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
 
-                    <TextBlock Text="POTVRDA AKCIJE: UKLANJANJE ENTITETA"
-                               FontWeight="SemiBold"
-                               FontSize="13"/>
-
-                    <TextBlock Grid.Row="1"
-                               Text="Da li ste sigurni da želite trajno obrisati selektovani put? Ova akcija će kasnije ukloniti i sve povezane linije."
+                    <TextBlock Text="Da li ste sigurni da želite trajno obrisati selektovani put? Ova akcija će kasnije ukloniti i sve povezane linije."
                                TextWrapping="Wrap"
-                               VerticalAlignment="Center"/>
+                               FontSize="13"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,0,0,22"/>
 
-                    <StackPanel Grid.Row="2"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Center">
-
-                        <Button Content="DA, POTVRĐUJEM"
-                                Width="145"
-                                Height="30"
-                                Margin="0,0,30,0"
-                                Command="{Binding ConfirmDeleteEntityCommand}"
-                                Cursor="Hand"/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right">
 
                         <Button Content="ODUSTANI"
                                 Width="120"
-                                Height="30"
+                                Height="34"
+                                Margin="0,0,12,0"
                                 Command="{Binding CancelDeleteEntityCommand}"
                                 Cursor="Hand"/>
+
+                        <Button Content="DA, POTVRĐUJEM"
+                                Style="{StaticResource DangerButton}"
+                                Width="150"
+                                Height="34"
+                                Command="{Binding ConfirmDeleteEntityCommand}"
+                                Cursor="Hand"/>
                     </StackPanel>
-                </Grid>
+                </StackPanel>
             </Border>
         </Grid>
     </Grid>
