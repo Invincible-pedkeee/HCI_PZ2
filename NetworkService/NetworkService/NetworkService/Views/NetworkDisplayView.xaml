@@ -3,6 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:model="clr-namespace:NetworkService.Model">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -43,21 +47,29 @@
                         </HierarchicalDataTemplate>
 
                         <DataTemplate DataType="{x:Type model:NetworkEntity}">
-                            <StackPanel Orientation="Vertical"
+                            <StackPanel Orientation="Horizontal"
                                         Margin="0,4,0,4">
 
-                                <TextBlock FontWeight="SemiBold"
-                                           Text="{Binding Name}"/>
+                                <Image Source="{Binding Type.ImagePath}"
+                                       Width="30"
+                                       Height="30"
+                                       Margin="0,0,8,0"
+                                       VerticalAlignment="Center"/>
 
-                                <TextBlock FontSize="11"
-                                           Foreground="Gray">
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0} | ID: {1}">
-                                            <Binding Path="Type.Name"/>
-                                            <Binding Path="Id"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock FontWeight="SemiBold"
+                                               Text="{Binding Name}"/>
+
+                                    <TextBlock FontSize="11"
+                                               Foreground="Gray">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} | ID: {1}">
+                                                <Binding Path="Type.Name"/>
+                                                <Binding Path="Id"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
                             </StackPanel>
                         </DataTemplate>
                     </TreeView.Resources>
@@ -141,6 +153,13 @@
 
                                     <StackPanel Grid.Row="1"
                                                 VerticalAlignment="Center">
+
+                                        <Image Source="{Binding OccupiedEntity.Type.ImagePath}"
+                                               Width="46"
+                                               Height="46"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,8"
+                                               Visibility="{Binding IsOccupied, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                                         <TextBlock Text="{Binding DetailsText}"
                                                    TextWrapping="Wrap"

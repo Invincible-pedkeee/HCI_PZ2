@@ -124,7 +124,7 @@ namespace NetworkService.ViewModel
 
             meteringReceiverService.Start();
 
-            NavigationCommand = new MyICommandWithParameter<string>(OnNavigate);
+             
 
 
             CurrentViewModel = networkEntitiesViewModel;

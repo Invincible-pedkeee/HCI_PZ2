@@ -57,8 +57,8 @@ namespace NetworkService.Services
         }
         private void LoadEntityTypes()
         {
-            EntityTypes.Add(new EntityType("IA", "Resources/Images/road_ia.png", 15000));
-            EntityTypes.Add(new EntityType("IB", "Resources/Images/road_ib.png", 7000));
+            EntityTypes.Add(new EntityType("IA", "/Resources/Images/road_ia.png", 15000));
+            EntityTypes.Add(new EntityType("IB", "/Resources/Images/road_ib.png", 7000));
         }
 
         private void LoadInitialEntities()

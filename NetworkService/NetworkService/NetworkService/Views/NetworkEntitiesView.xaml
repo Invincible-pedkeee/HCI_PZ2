@@ -82,7 +82,7 @@
 
                 <TextBlock Text="ID uslov"
                            FontSize="11"
-                           Margin="0,10,0,3"/>      
+                           Margin="0,10,0,3"/>
 
                 <ComboBox Height="28"
                           ItemsSource="{Binding IdComparisonOptions}"
@@ -123,12 +123,12 @@
                             ToolTip="Apply selected filters"/>
 
                     <Button Content="RESET"
-            Width="90"
-            Height="28"
-            Margin="8,0,0,0"
-            Command="{Binding ClearFilterCommand}"
-            Cursor="Hand"
-            ToolTip="Clear all filters"/>
+                            Width="90"
+                            Height="28"
+                            Margin="8,0,0,0"
+                            Command="{Binding ClearFilterCommand}"
+                            Cursor="Hand"
+                            ToolTip="Clear all filters"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -162,7 +162,20 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID"
                                         Binding="{Binding Id}"
-                                        Width="60"/>
+                                        Width="55"/>
+
+                    <DataGridTemplateColumn Header="Slika"
+                                            Width="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Type.ImagePath}"
+                                       Width="34"
+                                       Height="34"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="Naziv"
                                         Binding="{Binding Name}"
@@ -170,45 +183,45 @@
 
                     <DataGridTextColumn Header="Tip"
                                         Binding="{Binding Type.Name}"
-                                        Width="80"/>
+                                        Width="70"/>
 
                     <DataGridTextColumn Header="Poslednja vrednost"
                                         Binding="{Binding LastValue}"
-                                        Width="160"/>
+                                        Width="145"/>
 
                     <DataGridTextColumn Header="Status"
                                         Binding="{Binding Status}"
-                                        Width="150"/>
+                                        Width="135"/>
                 </DataGrid.Columns>
             </DataGrid>
 
             <StackPanel Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
-            Margin="0,12,0,0">
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,12,0,0">
 
                 <Button Content="UNDO"
-            Width="90"
-            Height="30"
-            Command="{Binding UndoCommand}"
-            Cursor="Hand"
-            ToolTip="Undo last action on Network Entities View"/>
+                        Width="90"
+                        Height="30"
+                        Command="{Binding UndoCommand}"
+                        Cursor="Hand"
+                        ToolTip="Undo last action on Network Entities View"/>
 
                 <Button Content="UNDO ALL"
-            Width="100"
-            Height="30"
-            Margin="8,0,0,0"
-            Command="{Binding UndoAllCommand}"
-            Cursor="Hand"
-            ToolTip="Undo all actions on Network Entities View"/>
+                        Width="100"
+                        Height="30"
+                        Margin="8,0,0,0"
+                        Command="{Binding UndoAllCommand}"
+                        Cursor="Hand"
+                        ToolTip="Undo all actions on Network Entities View"/>
 
                 <Button Content="[-] OBRIŠI SELEKTOVANO"
-            Width="170"
-            Height="30"
-            Margin="8,0,0,0"
-            Command="{Binding RequestDeleteEntityCommand}"
-            Cursor="Hand"
-            ToolTip="Delete selected road entity"/>
+                        Width="170"
+                        Height="30"
+                        Margin="8,0,0,0"
+                        Command="{Binding RequestDeleteEntityCommand}"
+                        Cursor="Hand"
+                        ToolTip="Delete selected road entity"/>
             </StackPanel>
         </Grid>
 
