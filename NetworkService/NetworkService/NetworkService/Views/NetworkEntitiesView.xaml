@@ -34,7 +34,9 @@
                             Padding="14"
                             Effect="{StaticResource SoftShadow}">
                         <StackPanel>
+                            
                             <TextBox Height="32"
+                                     Padding="1"   
                                      Text="{Binding CurrentEntityInput.IdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite jedinstveni ID puta (cijeli broj)"/>
 
@@ -43,6 +45,7 @@
                                        Margin="0,3,0,8"/>
 
                             <TextBox Height="32"
+                                     Padding="1"
                                      Text="{Binding CurrentEntityInput.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite naziv puta (npr. Autoput E75)"/>
 
@@ -124,6 +127,7 @@
                                        Margin="0,3,0,6"/>
 
                             <TextBox Height="32"
+                                     Padding="1"
                                      Text="{Binding FilterIdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite ID vrijednost za filtriranje"/>
 
