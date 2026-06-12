@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using NetworkService.Helpers;
+using NetworkService.Helpers.Graph;
 using NetworkService.Model;
 using NetworkService.Services;
 
@@ -10,9 +11,21 @@ namespace NetworkService.ViewModel
     public class MeasurementGraphViewModel : BindableBase
     {
         private readonly NetworkDataService dataService;
+        private readonly MeasurementGraphBuilderService graphBuilderService;
 
         private NetworkEntity selectedEntity;
         private ObservableCollection<Measurement> lastMeasurements;
+        private ObservableCollection<MeasurementGraphLine> measurementLines;
+        private ObservableCollection<MeasurementGraphMarker> measurementMarkers;
+        private ObservableCollection<MeasurementGraphLabel> measurementLabels;
+        private ObservableCollection<DistributionSegment> distributionSegments;
+
+        private bool hasMeasurements;
+        private string minValueLabel;
+        private string maxValueLabel;
+        private double iaPercentage;
+        private double ibPercentage;
+        private string distributionText;
 
         public ObservableCollection<NetworkEntity> Entities
         {
@@ -34,6 +47,54 @@ namespace NetworkService.ViewModel
             }
         }
 
+        public ObservableCollection<MeasurementGraphLine> MeasurementLines
+        {
+            get
+            {
+                return measurementLines;
+            }
+            set
+            {
+                SetProperty(ref measurementLines, value);
+            }
+        }
+
+        public ObservableCollection<MeasurementGraphMarker> MeasurementMarkers
+        {
+            get
+            {
+                return measurementMarkers;
+            }
+            set
+            {
+                SetProperty(ref measurementMarkers, value);
+            }
+        }
+
+        public ObservableCollection<MeasurementGraphLabel> MeasurementLabels
+        {
+            get
+            {
+                return measurementLabels;
+            }
+            set
+            {
+                SetProperty(ref measurementLabels, value);
+            }
+        }
+
+        public ObservableCollection<DistributionSegment> DistributionSegments
+        {
+            get
+            {
+                return distributionSegments;
+            }
+            set
+            {
+                SetProperty(ref distributionSegments, value);
+            }
+        }
+
         public NetworkEntity SelectedEntity
         {
             get
@@ -47,11 +108,92 @@ namespace NetworkService.ViewModel
             }
         }
 
+        public bool HasMeasurements
+        {
+            get
+            {
+                return hasMeasurements;
+            }
+            set
+            {
+                SetProperty(ref hasMeasurements, value);
+                OnPropertyChanged("HasNoMeasurements");
+            }
+        }
+
+        public bool HasNoMeasurements
+        {
+            get
+            {
+                return !HasMeasurements;
+            }
+        }
+
+        public string MinValueLabel
+        {
+            get
+            {
+                return minValueLabel;
+            }
+            set
+            {
+                SetProperty(ref minValueLabel, value);
+            }
+        }
+
+        public string MaxValueLabel
+        {
+            get
+            {
+                return maxValueLabel;
+            }
+            set
+            {
+                SetProperty(ref maxValueLabel, value);
+            }
+        }
+
+        public double MeasurementCanvasWidth
+        {
+            get
+            {
+                return graphBuilderService.MeasurementCanvasWidth;
+            }
+        }
+
+        public double MeasurementCanvasHeight
+        {
+            get
+            {
+                return graphBuilderService.MeasurementCanvasHeight;
+            }
+        }
+
+        public double DistributionCanvasWidth
+        {
+            get
+            {
+                return graphBuilderService.DistributionCanvasWidth;
+            }
+        }
+
+        public double DistributionCanvasHeight
+        {
+            get
+            {
+                return graphBuilderService.DistributionCanvasHeight;
+            }
+        }
+
         public double IaPercentage
         {
             get
             {
-                return CalculateTypePercentage("IA");
+                return iaPercentage;
+            }
+            set
+            {
+                SetProperty(ref iaPercentage, value);
             }
         }
 
@@ -59,7 +201,11 @@ namespace NetworkService.ViewModel
         {
             get
             {
-                return CalculateTypePercentage("IB");
+                return ibPercentage;
+            }
+            set
+            {
+                SetProperty(ref ibPercentage, value);
             }
         }
 
@@ -67,16 +213,28 @@ namespace NetworkService.ViewModel
         {
             get
             {
-                return "Tip IA: " + IaPercentage.ToString("0.0") +
-                       "% | Tip IB: " + IbPercentage.ToString("0.0") + "%";
+                return distributionText;
+            }
+            set
+            {
+                SetProperty(ref distributionText, value);
             }
         }
 
         public MeasurementGraphViewModel(NetworkDataService dataService)
         {
             this.dataService = dataService;
+            graphBuilderService = new MeasurementGraphBuilderService();
 
             LastMeasurements = new ObservableCollection<Measurement>();
+            MeasurementLines = new ObservableCollection<MeasurementGraphLine>();
+            MeasurementMarkers = new ObservableCollection<MeasurementGraphMarker>();
+            MeasurementLabels = new ObservableCollection<MeasurementGraphLabel>();
+            DistributionSegments = new ObservableCollection<DistributionSegment>();
+
+            MinValueLabel = string.Empty;
+            MaxValueLabel = string.Empty;
+            DistributionText = "Tip IA: 0.0% | Tip IB: 0.0%";
 
             dataService.Measurements.CollectionChanged += Measurements_CollectionChanged;
             dataService.Entities.CollectionChanged += Entities_CollectionChanged;
@@ -87,6 +245,7 @@ namespace NetworkService.ViewModel
             }
 
             RefreshLastMeasurements();
+            RefreshDistributionGraph();
         }
 
         private void Measurements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -113,9 +272,7 @@ namespace NetworkService.ViewModel
                 SelectedEntity = dataService.Entities[0];
             }
 
-            OnPropertyChanged("IaPercentage");
-            OnPropertyChanged("IbPercentage");
-            OnPropertyChanged("DistributionText");
+            RefreshDistributionGraph();
         }
 
         private void RefreshLastMeasurements()
@@ -123,24 +280,39 @@ namespace NetworkService.ViewModel
             if (SelectedEntity == null)
             {
                 LastMeasurements = new ObservableCollection<Measurement>();
+
+                ApplyMeasurementGraphResult(
+                    graphBuilderService.BuildMeasurementGraph(LastMeasurements));
+
                 return;
             }
 
             LastMeasurements = dataService.GetLastMeasurementsForEntity(SelectedEntity.Id, 5);
+
+            ApplyMeasurementGraphResult(
+                graphBuilderService.BuildMeasurementGraph(LastMeasurements));
         }
 
-        private double CalculateTypePercentage(string typeName)
+        private void RefreshDistributionGraph()
         {
-            if (dataService.Entities.Count == 0)
-            {
-                return 0;
-            }
+            DistributionGraphBuildResult result =
+                graphBuilderService.BuildDistributionGraph(dataService.Entities);
 
-            int typeCount = dataService.Entities.Count(entity =>
-                entity.Type != null &&
-                entity.Type.Name == typeName);
+            DistributionSegments = result.Segments;
+            IaPercentage = result.IaPercentage;
+            IbPercentage = result.IbPercentage;
+            DistributionText = result.DistributionText;
+        }
 
-            return typeCount * 100.0 / dataService.Entities.Count;
+        private void ApplyMeasurementGraphResult(MeasurementGraphBuildResult result)
+        {
+            MeasurementLines = result.Lines;
+            MeasurementMarkers = result.Markers;
+            MeasurementLabels = result.Labels;
+
+            MinValueLabel = result.MinValueLabel;
+            MaxValueLabel = result.MaxValueLabel;
+            HasMeasurements = result.HasMeasurements;
         }
     }
 }

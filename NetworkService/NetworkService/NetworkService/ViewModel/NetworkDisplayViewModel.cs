@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using NetworkService.Helpers;
- 
 using NetworkService.Helpers.Undo;
 using NetworkService.Model;
 using NetworkService.Services;
@@ -71,6 +70,10 @@ namespace NetworkService.ViewModel
 
         public MyICommand UndoAllCommand { get; private set; }
 
+        public MyICommandWithParameter<DisplaySlot> ConnectSlotCommand { get; private set; }
+
+        public MyICommandWithParameter<DisplaySlot> RemoveSlotCommand { get; private set; }
+
         public NetworkDisplayViewModel(NetworkDataService dataService, ToastNotificationService toastService)
         {
             this.dataService = dataService;
@@ -79,6 +82,8 @@ namespace NetworkService.ViewModel
 
             UndoCommand = new MyICommand(OnUndo, CanUndo);
             UndoAllCommand = new MyICommand(OnUndoAll, CanUndo);
+            ConnectSlotCommand = new MyICommandWithParameter<DisplaySlot>(StartOrCompleteConnection);
+            RemoveSlotCommand = new MyICommandWithParameter<DisplaySlot>(RemoveEntityFromSlot);
 
             ConnectionInfoText = "Za kreiranje veze kliknite Poveži na prvom, zatim na drugom entitetu.";
             RefreshAvailableEntityGroups();
@@ -182,6 +187,7 @@ namespace NetworkService.ViewModel
                 "Entitet ID: " + entity.Id +
                 " premješten sa slota " + sourceSlotNumber +
                 " na slot " + targetSlotNumber + ".");
+
             toastService.ShowInfo("Entitet ID: " + entity.Id + " je premješten na drugi slot.");
         }
 
@@ -275,10 +281,12 @@ namespace NetworkService.ViewModel
             dataService.AddHistory(
                 "Kreirana veza između entiteta ID: " +
                 firstEntity.Id + " i ID: " + secondEntity.Id + ".");
-            toastService.ShowSuccess("Kreirana je veza između entiteta ID: " + firstEntity.Id + " i ID: " + secondEntity.Id + ".");
+
+            toastService.ShowSuccess(
+                "Kreirana je veza između entiteta ID: " +
+                firstEntity.Id + " i ID: " + secondEntity.Id + ".");
 
             ClearSelectedConnectionSlot();
-
             ConnectionInfoText = "Veza je uspješno kreirana.";
         }
 

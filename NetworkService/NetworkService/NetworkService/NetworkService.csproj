@@ -55,9 +55,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ConnectionLinesCanvas.cs" />
     <Compile Include="Helpers\BindableBase.cs" />
     <Compile Include="Helpers\Commands\MyICommand.cs" />
     <Compile Include="Helpers\Commands\MyICommandWithParameter.cs" />
+    <Compile Include="Helpers\Graph\DistributionGraphBuildResult.cs" />
+    <Compile Include="Helpers\Graph\DistributionSegment.cs" />
+    <Compile Include="Helpers\Graph\MeasurementGraphBuildResult.cs" />
+    <Compile Include="Helpers\Graph\MeasurementGraphLabel.cs" />
+    <Compile Include="Helpers\Graph\MeasurementGraphLine.cs" />
+    <Compile Include="Helpers\Graph\MeasurementGraphMarker.cs" />
+    <Compile Include="Helpers\NetworkDisplay\NetworkDisplayDragDropBehavior.cs" />
     <Compile Include="Helpers\Undo\UndoAction.cs" />
     <Compile Include="Helpers\Validations\ValidationBase.cs" />
     <Compile Include="Helpers\Validations\ValidationErrors.cs" />
@@ -70,6 +78,7 @@
     <Compile Include="Model\Measurement.cs" />
     <Compile Include="Model\NetworkEntity.cs" />
     <Compile Include="Model\NetworkEntityInput.cs" />
+    <Compile Include="Services\MeasurementGraphBuilderService.cs" />
     <Compile Include="Services\MeasurementLogService.cs" />
     <Compile Include="Services\MeteringReceiverService.cs" />
     <Compile Include="Services\NetworkDataService.cs" />

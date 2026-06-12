@@ -8,13 +8,12 @@ namespace NetworkService.Services
     public class NetworkDataService
     {
         private readonly MeasurementLogService measurementLogService;
+
         public ObservableCollection<EntityType> EntityTypes { get; private set; }
         public ObservableCollection<ConnectionLine> Connections { get; private set; }
         public ObservableCollection<DisplaySlot> DisplaySlots { get; private set; }
         public ObservableCollection<NetworkEntity> Entities { get; private set; }
-
         public ObservableCollection<Measurement> Measurements { get; private set; }
-
         public ObservableCollection<HistoryAction> HistoryActions { get; private set; }
 
         public NetworkDataService()
@@ -27,12 +26,14 @@ namespace NetworkService.Services
             HistoryActions = new ObservableCollection<HistoryAction>();
             DisplaySlots = new ObservableCollection<DisplaySlot>();
             Connections = new ObservableCollection<ConnectionLine>();
+
             LoadEntityTypes();
             LoadInitialEntities();
             LoadDisplaySlots();
 
             AddHistory("Sistem pokrenut.");
         }
+
         private void LoadDisplaySlots()
         {
             for (int i = 1; i <= 12; i++)
@@ -40,6 +41,7 @@ namespace NetworkService.Services
                 DisplaySlots.Add(new DisplaySlot(i));
             }
         }
+
         public void RemoveConnectionsForEntity(NetworkEntity entity)
         {
             if (entity == null)
@@ -55,6 +57,7 @@ namespace NetworkService.Services
                 }
             }
         }
+
         private void LoadEntityTypes()
         {
             EntityTypes.Add(new EntityType("IA", "/Resources/Images/road_ia.png", 15000));
@@ -136,6 +139,8 @@ namespace NetworkService.Services
                 entity.IsValueValid);
 
             Measurements.Add(measurement);
+
+            // Bitno: mjerenje se upisuje u .txt fajl.
             measurementLogService.WriteMeasurement(measurement, entity);
 
             AddHistory("Primljeno mjerenje za ID: " + entity.Id + ", vrijednost: " + value);
@@ -145,14 +150,8 @@ namespace NetworkService.Services
 
         public ObservableCollection<Measurement> GetLastMeasurementsForEntity(int entityId, int count)
         {
-            var lastMeasurements = Measurements
-                .Where(measurement => measurement.EntityId == entityId)
-                .OrderByDescending(measurement => measurement.Timestamp)
-                .Take(count)
-                .OrderBy(measurement => measurement.Timestamp)
-                .ToList();
-
-            return new ObservableCollection<Measurement>(lastMeasurements);
+            // Bitno: graf sada čita iz .txt fajla, a ne iz memorijske kolekcije.
+            return measurementLogService.ReadLastMeasurementsForEntity(entityId, count);
         }
 
         public void AddHistory(string description)
@@ -164,7 +163,5 @@ namespace NetworkService.Services
                 HistoryActions.RemoveAt(HistoryActions.Count - 1);
             }
         }
-
-
     }
 }

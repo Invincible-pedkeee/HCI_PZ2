@@ -1,7 +1,9 @@
 ﻿<UserControl x:Class="NetworkService.Views.NetworkDisplayView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:model="clr-namespace:NetworkService.Model">
+             xmlns:model="clr-namespace:NetworkService.Model"
+             xmlns:controls="clr-namespace:NetworkService.Controls"
+             xmlns:networkDisplayHelpers="clr-namespace:NetworkService.Helpers.NetworkDisplay">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -41,8 +43,7 @@
 
                     <TreeView x:Name="EntitiesTreeView"
                               ItemsSource="{Binding AvailableEntityGroups}"
-                              SelectedItemChanged="EntitiesTreeView_SelectedItemChanged"
-                              MouseLeftButtonUp="EntitiesTreeView_MouseLeftButtonUp"
+                              networkDisplayHelpers:NetworkDisplayDragDropBehavior.EnableTreeViewEntityDrag="True"
                               Background="Transparent"
                               BorderThickness="0"
                               ToolTip="Drag road entities from this tree to the display grid">
@@ -71,6 +72,7 @@
 
                                         <StackPanel Orientation="Vertical"
                                                     VerticalAlignment="Center">
+
                                             <TextBlock FontWeight="SemiBold"
                                                        FontSize="13"
                                                        Text="{Binding Name}"/>
@@ -105,6 +107,7 @@
 
             <StackPanel Grid.Row="0"
                         Margin="0,0,0,14">
+
                 <TextBlock Text="PRIKAZ MREŽE"
                            FontSize="15"
                            FontWeight="SemiBold"
@@ -116,9 +119,6 @@
                            Foreground="{StaticResource TextMutedBrush}"/>
             </StackPanel>
 
-            <!-- IMPORTANT: ItemsControl and ConnectionsCanvas must remain the
-                 two direct children of this single Grid cell so the connection
-                 lines are computed in the same coordinate space. -->
             <Grid Grid.Row="1">
 
                 <ItemsControl x:Name="DisplaySlotsItemsControl"
@@ -160,15 +160,13 @@
                                 <Canvas AllowDrop="True"
                                         Background="Transparent"
                                         ClipToBounds="True"
-                                        MouseLeftButtonDown="DisplaySlot_MouseLeftButtonDown"
-                                        DragOver="DisplaySlot_DragOver"
-                                        Drop="DisplaySlot_Drop">
+                                        networkDisplayHelpers:NetworkDisplayDragDropBehavior.EnableSlotDragDrop="True">
 
                                     <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
                                           Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}"
                                           Margin="8">
 
-                                        <!-- ========== EMPTY SLOT ========== -->
+                                        <!-- EMPTY SLOT -->
                                         <StackPanel VerticalAlignment="Center">
                                             <StackPanel.Style>
                                                 <Style TargetType="StackPanel">
@@ -200,7 +198,7 @@
                                                        Margin="0,4,0,0"/>
                                         </StackPanel>
 
-                                        <!-- ========== OCCUPIED SLOT ========== -->
+                                        <!-- OCCUPIED SLOT -->
                                         <Grid Visibility="{Binding IsOccupied, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
@@ -208,9 +206,9 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
 
-                                            <!-- Header: Canvas N + Image -->
                                             <Grid Grid.Row="0"
                                                   Margin="0,0,0,4">
+
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
@@ -228,6 +226,7 @@
                                                         BorderThickness="1"
                                                         CornerRadius="4"
                                                         Padding="2">
+
                                                     <Image Source="{Binding OccupiedEntity.Type.ImagePath}"
                                                            Width="50"
                                                            Height="50"
@@ -235,7 +234,6 @@
                                                 </Border>
                                             </Grid>
 
-                                            <!-- Entity Details -->
                                             <StackPanel Grid.Row="1"
                                                         VerticalAlignment="Center">
 
@@ -262,7 +260,6 @@
                                                            Text="{Binding OccupiedEntity.Status, StringFormat='Status: {0}'}"/>
                                             </StackPanel>
 
-                                            <!-- Buttons side by side -->
                                             <StackPanel Grid.Row="2"
                                                         Orientation="Horizontal"
                                                         HorizontalAlignment="Center"
@@ -272,7 +269,8 @@
                                                         Style="{StaticResource SlotButton}"
                                                         Width="70"
                                                         Height="24"
-                                                        Click="ConnectSlotButton_Click"
+                                                        Command="{Binding DataContext.ConnectSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
                                                         Cursor="Hand"
                                                         ToolTip="Kreiranje veze sa drugim entitetom"/>
 
@@ -281,12 +279,12 @@
                                                         Width="80"
                                                         Height="24"
                                                         Margin="6,30,30,30"
-                                                        Click="RemoveSlotButton_Click"
+                                                        Command="{Binding DataContext.RemoveSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
                                                         Cursor="Hand"
                                                         ToolTip="Ukloni entitet sa mreže"/>
                                             </StackPanel>
                                         </Grid>
-
                                     </Grid>
                                 </Canvas>
                             </Border>
@@ -294,10 +292,11 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Canvas for drawing connection lines over display slots -->
-                <Canvas x:Name="ConnectionsCanvas"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="10"/>
+                <controls:ConnectionLinesCanvas DisplaySlotsItemsControl="{Binding ElementName=DisplaySlotsItemsControl}"
+                                                 DisplaySlots="{Binding DisplaySlots}"
+                                                 Connections="{Binding Connections}"
+                                                 IsHitTestVisible="False"
+                                                 Panel.ZIndex="10"/>
             </Grid>
         </Grid>
 
@@ -323,6 +322,7 @@
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding HistoryActions}"
                          FontSize="11">
+
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"
