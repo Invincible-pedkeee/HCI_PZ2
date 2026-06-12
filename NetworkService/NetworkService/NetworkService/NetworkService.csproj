@@ -73,6 +73,7 @@
     <Compile Include="Services\MeasurementLogService.cs" />
     <Compile Include="Services\MeteringReceiverService.cs" />
     <Compile Include="Services\NetworkDataService.cs" />
+    <Compile Include="Services\SimulatorRestartService.cs" />
     <Compile Include="Services\ToastNotificationService.cs" />
     <Compile Include="Services\ToastNotificationType.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />

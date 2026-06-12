@@ -1,4 +1,5 @@
-﻿using NetworkService.Helpers;
+﻿using System.Collections.Specialized;
+using NetworkService.Helpers;
 using NetworkService.Services;
 using System.Windows;
 
@@ -11,6 +12,7 @@ namespace NetworkService.ViewModel
         private string statusMessage;
 
         private readonly MeteringReceiverService meteringReceiverService;
+        private readonly SimulatorRestartService simulatorRestartService;
         private readonly NetworkDataService dataService;
 
         private readonly NetworkEntitiesViewModel networkEntitiesViewModel;
@@ -88,6 +90,18 @@ namespace NetworkService.ViewModel
                 meteringReceiverService.Stop();
             }
         }
+
+        private void Entities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add ||
+                e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                simulatorRestartService.RestartSimulatorAsync();
+
+                StatusMessage = "Broj entiteta promijenjen. Simulator se restartuje...";
+                dataService.AddHistory("Automatski restart simulatora nakon promjene broja entiteta.");
+            }
+        }
         public string StatusMessage
         {
             get
@@ -124,7 +138,8 @@ namespace NetworkService.ViewModel
 
             meteringReceiverService.Start();
 
-             
+            simulatorRestartService = new SimulatorRestartService();
+            dataService.Entities.CollectionChanged += Entities_CollectionChanged;
 
 
             CurrentViewModel = networkEntitiesViewModel;

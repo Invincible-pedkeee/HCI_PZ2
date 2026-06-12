@@ -303,14 +303,14 @@ namespace NetworkService.Views
 
         private DisplaySlot GetDisplaySlotFromSender(object sender)
         {
-            Border border = sender as Border;
+            FrameworkElement element = sender as FrameworkElement;
 
-            if (border == null)
+            if (element == null)
             {
                 return null;
             }
 
-            return border.DataContext as DisplaySlot;
+            return element.DataContext as DisplaySlot;
         }
 
         private NetworkEntity GetDraggedEntityFromEvent(DragEventArgs e)
