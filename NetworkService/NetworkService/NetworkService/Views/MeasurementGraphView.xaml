@@ -16,7 +16,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ENTITY SELECTION -->
         <Border Grid.Row="0"
                 Background="{StaticResource CardBgBrush}"
                 BorderBrush="{StaticResource CardBorderBrush}"
@@ -44,7 +43,6 @@
             </StackPanel>
         </Border>
 
-        <!-- G1 MEASUREMENT GRAPH -->
         <Border Grid.Row="1"
                 Background="{StaticResource CardBgBrush}"
                 BorderBrush="{StaticResource CardBorderBrush}"
@@ -83,13 +81,59 @@
                                        Canvas.Left="290"
                                        Canvas.Top="130"/>
 
+                            <!-- HORIZONTAL GRID LINES -->
+                            <Line X1="60"
+                                  Y1="35"
+                                  X2="860"
+                                  Y2="35"
+                                  Stroke="#E5EAF3"
+                                  StrokeThickness="1"
+                                  StrokeDashArray="4 4"
+                                  Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Line X1="60"
+                                  Y1="84"
+                                  X2="860"
+                                  Y2="84"
+                                  Stroke="#E5EAF3"
+                                  StrokeThickness="1"
+                                  StrokeDashArray="4 4"
+                                  Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Line X1="60"
+                                  Y1="134"
+                                  X2="860"
+                                  Y2="134"
+                                  Stroke="#E5EAF3"
+                                  StrokeThickness="1"
+                                  StrokeDashArray="4 4"
+                                  Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Line X1="60"
+                                  Y1="183"
+                                  X2="860"
+                                  Y2="183"
+                                  Stroke="#E5EAF3"
+                                  StrokeThickness="1"
+                                  StrokeDashArray="4 4"
+                                  Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Line X1="60"
+                                  Y1="232"
+                                  X2="860"
+                                  Y2="232"
+                                  Stroke="#E5EAF3"
+                                  StrokeThickness="1"
+                                  StrokeDashArray="4 4"
+                                  Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
                             <!-- Y AXIS -->
                             <Line X1="60"
                                   Y1="35"
                                   X2="60"
                                   Y2="232"
-                                  Stroke="Gray"
-                                  StrokeThickness="1"
+                                  Stroke="#64748B"
+                                  StrokeThickness="1.2"
                                   Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                             <!-- X AXIS -->
@@ -97,34 +141,22 @@
                                   Y1="232"
                                   X2="860"
                                   Y2="232"
-                                  Stroke="Gray"
-                                  StrokeThickness="1"
+                                  Stroke="#64748B"
+                                  StrokeThickness="1.2"
                                   Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                             <TextBlock Text="Vrijednost"
                                        FontSize="11"
+                                       Foreground="#1F2937"
                                        Canvas.Left="12"
                                        Canvas.Top="8"
                                        Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                             <TextBlock Text="Vrijeme"
                                        FontSize="11"
+                                       Foreground="#1F2937"
                                        Canvas.Left="820"
                                        Canvas.Top="256"
-                                       Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-                            <TextBlock Text="{Binding MaxValueLabel}"
-                                       FontSize="10"
-                                       Foreground="Gray"
-                                       Canvas.Left="20"
-                                       Canvas.Top="27"
-                                       Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-                            <TextBlock Text="{Binding MinValueLabel}"
-                                       FontSize="10"
-                                       Foreground="Gray"
-                                       Canvas.Left="20"
-                                       Canvas.Top="224"
                                        Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                             <!-- GRAPH LINES -->
@@ -144,8 +176,10 @@
                                               Y1="{Binding Y1}"
                                               X2="{Binding X2}"
                                               Y2="{Binding Y2}"
-                                              Stroke="Black"
-                                              StrokeThickness="1.5"/>
+                                              Stroke="#2563EB"
+                                              StrokeThickness="2.2"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -173,15 +207,15 @@
                                         <Grid Width="{Binding Size}"
                                               Height="{Binding Size}">
 
-                                            <Ellipse StrokeThickness="1.5">
+                                            <Ellipse StrokeThickness="2">
                                                 <Ellipse.Style>
                                                     <Style TargetType="Ellipse">
-                                                        <Setter Property="Stroke" Value="Black"/>
-                                                        <Setter Property="Fill" Value="White"/>
+                                                        <Setter Property="Stroke" Value="#1F2937"/>
+                                                        <Setter Property="Fill" Value="#F8FAFC"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsInvalid}" Value="True">
-                                                                <Setter Property="Fill" Value="#FFB3B3"/>
-                                                                <Setter Property="Stroke" Value="#D64545"/>
+                                                                <Setter Property="Fill" Value="#FECACA"/>
+                                                                <Setter Property="Stroke" Value="#DC2626"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -189,18 +223,22 @@
                                             </Ellipse>
 
                                             <TextBlock Text="{Binding ValueText}"
-                                                       FontSize="11"
+                                                       FontSize="10"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#1F2937"
                                                        TextAlignment="Center"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"/>
 
+                                            <!-- ! -->
                                             <TextBlock Text="!"
-                                                       FontSize="12"
+                                                       FontSize="10"
                                                        FontWeight="Bold"
+                                                       Foreground="#111827"
                                                        TextAlignment="Center"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Bottom"
-                                                       Margin="0,0,0,6">
+                                                       Margin="1,10,1,5">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -240,6 +278,7 @@
                                         <TextBlock Text="{Binding Text}"
                                                    Width="70"
                                                    FontSize="10"
+                                                   Foreground="#1F2937"
                                                    TextAlignment="Center"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -263,26 +302,29 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="42"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="PROCENTUALNA ZASTUPLJENOST TIPOVA PUTEVA"
                            Style="{StaticResource SectionHeader}"
-                           Margin="0,0,0,8"/>
+                           Margin="1,1,1,8"/>
 
                 <Border Grid.Row="1"
-                        CornerRadius="6"
-                        ClipToBounds="True">
+                        Height="34"
+                        CornerRadius="5"
+                        ClipToBounds="True"
+                        Background="#EEF2F7"
+                        VerticalAlignment="Center">
 
                     <Viewbox Stretch="Fill">
                         <Canvas Width="{Binding DistributionCanvasWidth}"
-                                Height="{Binding DistributionCanvasHeight}"
-                                Background="#FBFCFE">
+                                Height="34"
+                                Background="#EEF2F7">
 
                             <ItemsControl ItemsSource="{Binding DistributionSegments}"
                                           Width="{Binding DistributionCanvasWidth}"
-                                          Height="{Binding DistributionCanvasHeight}">
+                                          Height="34">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas/>
@@ -299,7 +341,8 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid Width="{Binding Width}"
-                                              Height="{Binding Height}">
+                                              Height="34"
+                                              ClipToBounds="True">
 
                                             <Rectangle>
                                                 <Rectangle.Style>
@@ -316,10 +359,12 @@
 
                                             <TextBlock Text="{Binding Text}"
                                                        FontSize="12"
-                                                       FontWeight="SemiBold"
+                                                       FontWeight="Bold"
                                                        Foreground="White"
                                                        HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center"
+                                                       TextAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -350,9 +395,9 @@
 
                 <Ellipse Width="18"
                          Height="18"
-                         Stroke="Black"
-                         StrokeThickness="1.5"
-                         Fill="White"
+                         Stroke="#1F2937"
+                         StrokeThickness="2"
+                         Fill="#F8FAFC"
                          Margin="0,0,8,0"
                          VerticalAlignment="Center"/>
 
@@ -363,9 +408,9 @@
 
                 <Ellipse Width="18"
                          Height="18"
-                         Stroke="#D64545"
-                         StrokeThickness="1.5"
-                         Fill="#FFB3B3"
+                         Stroke="#DC2626"
+                         StrokeThickness="2"
+                         Fill="#FECACA"
                          Margin="0,0,8,0"
                          VerticalAlignment="Center"/>
 

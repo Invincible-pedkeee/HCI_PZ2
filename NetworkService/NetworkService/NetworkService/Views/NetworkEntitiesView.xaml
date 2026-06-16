@@ -13,7 +13,7 @@
             <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT PANEL -->
+ 
         <Border Grid.Column="0"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -21,8 +21,7 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           Padding="18,18,18,18">
                 <StackPanel>
-
-                    <!-- ====== DODAVANJE NOVOG ENTITETA ====== -->
+ 
                     <TextBlock Text="DODAVANJE NOVOG ENTITETA"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,0,0,12"/>
@@ -72,7 +71,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- ====== PRETRAGA I FILTER ====== -->
+ 
                     <TextBlock Text="PRETRAGA I FILTER"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,24,0,12"/>
@@ -94,7 +93,7 @@
                                       DisplayMemberPath="Name"
                                       ToolTip="Filtriraj po tipu puta: IA ili IB"/>
 
-                            <!-- ID comparison as RadioButton group via ListBox -->
+                            
                             <ListBox ItemsSource="{Binding IdComparisonOptions}"
                                      SelectedItem="{Binding SelectedIdComparison, Mode=TwoWay}"
                                      Background="Transparent"
@@ -160,7 +159,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- ====== DODATNI FILTER STANJA ====== -->
+                    
                     <TextBlock Text="DODATNI FILTER STANJA"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,24,0,12"/>
@@ -172,7 +171,7 @@
                             Padding="14"
                             Effect="{StaticResource SoftShadow}">
 
-                        <!-- Status filter as RadioButton group via ListBox -->
+                        
                         <ListBox ItemsSource="{Binding StatusFilterOptions}"
                                  SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
                                  Background="Transparent"
@@ -199,7 +198,7 @@
             </ScrollViewer>
         </Border>
 
-        <!-- CENTER TABLE -->
+        
         <Grid Grid.Column="1"
               Margin="20">
 
@@ -224,52 +223,93 @@
                     Effect="{StaticResource SoftShadow}">
 
                 <DataGrid ItemsSource="{Binding FilteredEntities}"
-                          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          IsReadOnly="True"
-                          SelectionMode="Single"
-                          HeadersVisibility="Column"
-                          BorderThickness="0"
-                          Background="Transparent"
-                          ToolTip="Tabela svih monitorisanih puteva u sistemu">
+          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
+          AutoGenerateColumns="False"
+          CanUserAddRows="False"
+          IsReadOnly="True"
+          SelectionMode="Single"
+          HeadersVisibility="Column"
+          BorderThickness="0"
+          Background="Transparent"
+          RowHeight="46"
+          MinRowHeight="46"
+          ColumnHeaderHeight="42"
+          FontSize="13"
+          GridLinesVisibility="Horizontal"
+          HorizontalGridLinesBrush="#E5EAF3"
+          ToolTip="Tabela svih monitorisanih puteva u sistemu">
+
+                    <DataGrid.Resources>
+                        <Style x:Key="CenteredCellText" TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="4,0"/>
+                        </Style>
+
+                        <Style x:Key="NameCellText" TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="12,0,4,0"/>
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="10,0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Background" Value="#F3F6FA"/>
+                            <Setter Property="BorderBrush" Value="#DDE4EE"/>
+                        </Style>
+                    </DataGrid.Resources>
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID"
-                                            Binding="{Binding Id}"
-                                            Width="55"/>
+                            Binding="{Binding Id}"
+                            Width="80"
+                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTemplateColumn Header="Slika"
-                                                Width="70">
+                                Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Image Source="{Binding Type.ImagePath}"
-                                           Width="34"
-                                           Height="34"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                           Width="38"
+                           Height="38"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="Naziv"
-                                            Binding="{Binding Name}"
-                                            Width="*"/>
+                            Binding="{Binding Name}"
+                            Width="1.6*"
+                            MinWidth="280"
+                            ElementStyle="{StaticResource NameCellText}"/>
 
                         <DataGridTextColumn Header="Tip"
-                                            Binding="{Binding Type.Name}"
-                                            Width="70"/>
+                            Binding="{Binding Type.Name}"
+                            Width="105"
+                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTextColumn Header="Poslednja vrednost"
-                                            Binding="{Binding LastValue}"
-                                            Width="145"/>
+                            Binding="{Binding LastValue}"
+                            Width="1*"
+                            MinWidth="165"
+                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTemplateColumn Header="Status"
-                                                Width="135">
+                                Width="0.8*"
+                                MinWidth="145">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Status}"
-                                               Style="{StaticResource StatusCellText}"/>
+                               Style="{StaticResource StatusCellText}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -292,7 +332,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- RIGHT HISTORY PANEL -->
+         
         <Border Grid.Column="2"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -341,7 +381,7 @@
             </Grid>
         </Border>
 
-        <!-- CUSTOM DELETE CONFIRMATION OVERLAY -->
+        
         <Grid Grid.ColumnSpan="3"
               Background="#80101826"
               Visibility="{Binding IsDeleteDialogVisible, Converter={StaticResource BooleanToVisibilityConverter}}">

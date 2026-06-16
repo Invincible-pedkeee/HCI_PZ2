@@ -17,38 +17,28 @@ namespace NetworkService.Services
         private const double RightMargin = 40;
         private const double TopMargin = 35;
         private const double BottomMargin = 48;
-        private const double MarkerSize = 46;
+
+        // Malo manje tačke da se ne preklapaju sa vremenom i linijama
+        private const double MarkerSize = 38;
 
         public double MeasurementCanvasWidth
         {
-            get
-            {
-                return MeasurementCanvasWidthValue;
-            }
+            get { return MeasurementCanvasWidthValue; }
         }
 
         public double MeasurementCanvasHeight
         {
-            get
-            {
-                return MeasurementCanvasHeightValue;
-            }
+            get { return MeasurementCanvasHeightValue; }
         }
 
         public double DistributionCanvasWidth
         {
-            get
-            {
-                return DistributionCanvasWidthValue;
-            }
+            get { return DistributionCanvasWidthValue; }
         }
 
         public double DistributionCanvasHeight
         {
-            get
-            {
-                return DistributionCanvasHeightValue;
-            }
+            get { return DistributionCanvasHeightValue; }
         }
 
         public MeasurementGraphBuildResult BuildMeasurementGraph(ObservableCollection<Measurement> measurements)
@@ -62,13 +52,11 @@ namespace NetworkService.Services
 
             Measurement[] measurementArray = measurements.ToArray();
 
-            double minValue = measurementArray.Min(measurement => measurement.Value);
-            double maxValue = measurementArray.Max(measurement => measurement.Value);
+            // Y osa uvijek kreće od 0
+            double minValue = 0;
 
-            if (Math.Abs(maxValue - minValue) < 0.001)
-            {
-                maxValue = minValue + 1;
-            }
+            // Gornja granica se zaokružuje na lijepu vrijednost, npr. 25000 umjesto 20672
+            double maxValue = CalculateNiceAxisMaximum(measurementArray.Max(measurement => measurement.Value));
 
             MeasurementGraphMarker[] markers = CalculateMarkers(measurementArray, minValue, maxValue);
 
@@ -157,6 +145,16 @@ namespace NetworkService.Services
                 double normalizedValue =
                     (measurements[i].Value - minValue) / (maxValue - minValue);
 
+                if (normalizedValue < 0)
+                {
+                    normalizedValue = 0;
+                }
+
+                if (normalizedValue > 1)
+                {
+                    normalizedValue = 1;
+                }
+
                 double y =
                     MeasurementCanvasHeightValue -
                     BottomMargin -
@@ -170,11 +168,48 @@ namespace NetworkService.Services
                     y - MarkerSize / 2,
                     MarkerSize,
                     measurements[i].Value.ToString("0"),
-                    x - 35,
+                    x - 39,
                     !measurements[i].IsValid);
             }
 
             return markers;
+        }
+
+        private double CalculateNiceAxisMaximum(double maxValue)
+        {
+            if (maxValue <= 0)
+            {
+                return 1;
+            }
+
+            double paddedValue = maxValue * 1.10;
+            double magnitude = Math.Pow(10, Math.Floor(Math.Log10(paddedValue)));
+            double normalizedValue = paddedValue / magnitude;
+
+            double niceNormalizedValue;
+
+            if (normalizedValue <= 1)
+            {
+                niceNormalizedValue = 1;
+            }
+            else if (normalizedValue <= 2)
+            {
+                niceNormalizedValue = 2;
+            }
+            else if (normalizedValue <= 2.5)
+            {
+                niceNormalizedValue = 2.5;
+            }
+            else if (normalizedValue <= 5)
+            {
+                niceNormalizedValue = 5;
+            }
+            else
+            {
+                niceNormalizedValue = 10;
+            }
+
+            return niceNormalizedValue * magnitude;
         }
 
         private double CalculateTypePercentage(
