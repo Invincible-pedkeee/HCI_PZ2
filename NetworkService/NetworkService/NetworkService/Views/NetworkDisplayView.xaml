@@ -16,7 +16,7 @@
             <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT TREEVIEW -->
+        
         <Border Grid.Column="0"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -96,7 +96,7 @@
             </Grid>
         </Border>
 
-        <!-- CENTER DISPLAY GRID -->
+         
         <Grid Grid.Column="1"
               Margin="20">
 
@@ -166,7 +166,7 @@
                                           Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}"
                                           Margin="8">
 
-                                        <!-- EMPTY SLOT -->
+                                         
                                         <StackPanel VerticalAlignment="Center">
                                             <StackPanel.Style>
                                                 <Style TargetType="StackPanel">
@@ -198,7 +198,7 @@
                                                        Margin="0,4,0,0"/>
                                         </StackPanel>
 
-                                        <!-- OCCUPIED SLOT -->
+                                        
                                         <Grid Visibility="{Binding IsOccupied, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
@@ -300,7 +300,7 @@
             </Grid>
         </Grid>
 
-        <!-- RIGHT HISTORY PANEL -->
+         
         <Border Grid.Column="2"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"

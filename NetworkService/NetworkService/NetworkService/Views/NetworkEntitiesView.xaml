@@ -13,7 +13,6 @@
             <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
- 
         <Border Grid.Column="0"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -21,7 +20,7 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           Padding="18,18,18,18">
                 <StackPanel>
- 
+
                     <TextBlock Text="DODAVANJE NOVOG ENTITETA"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,0,0,12"/>
@@ -33,9 +32,13 @@
                             Padding="14"
                             Effect="{StaticResource SoftShadow}">
                         <StackPanel>
-                            
+
+                            <TextBlock Text="ID puta"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,4"/>
+
                             <TextBox Height="32"
-                                     Padding="1"   
+                                     Padding="6,0"
                                      Text="{Binding CurrentEntityInput.IdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite jedinstveni ID puta (cijeli broj)"/>
 
@@ -43,14 +46,22 @@
                                        Style="{StaticResource ValidationText}"
                                        Margin="0,3,0,8"/>
 
+                            <TextBlock Text="Naziv puta"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,4"/>
+
                             <TextBox Height="32"
-                                     Padding="1"
+                                     Padding="6,0"
                                      Text="{Binding CurrentEntityInput.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite naziv puta (npr. Autoput E75)"/>
 
                             <TextBlock Text="{Binding CurrentEntityInput.ValidationErrors[Name]}"
                                        Style="{StaticResource ValidationText}"
                                        Margin="0,3,0,8"/>
+
+                            <TextBlock Text="Tip puta"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,4"/>
 
                             <ComboBox Height="32"
                                       ItemsSource="{Binding EntityTypes}"
@@ -71,7 +82,6 @@
                         </StackPanel>
                     </Border>
 
- 
                     <TextBlock Text="PRETRAGA I FILTER"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,24,0,12"/>
@@ -93,12 +103,15 @@
                                       DisplayMemberPath="Name"
                                       ToolTip="Filtriraj po tipu puta: IA ili IB"/>
 
-                            
+                            <TextBlock Text="Poređenje po ID vrijednosti"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,12,0,4"/>
+
                             <ListBox ItemsSource="{Binding IdComparisonOptions}"
                                      SelectedItem="{Binding SelectedIdComparison, Mode=TwoWay}"
                                      Background="Transparent"
                                      BorderThickness="0"
-                                     Margin="0,12,0,0">
+                                     Margin="0,0,0,0">
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal"/>
@@ -125,8 +138,12 @@
                                        Style="{StaticResource ValidationText}"
                                        Margin="0,3,0,6"/>
 
+                            <TextBlock Text="ID vrijednost za filter"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,4"/>
+
                             <TextBox Height="32"
-                                     Padding="1"
+                                     Padding="6,0"
                                      Text="{Binding FilterIdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Unesite ID vrijednost za filtriranje"/>
 
@@ -159,7 +176,6 @@
                         </StackPanel>
                     </Border>
 
-                    
                     <TextBlock Text="DODATNI FILTER STANJA"
                                Style="{StaticResource SectionHeader}"
                                Margin="0,24,0,12"/>
@@ -171,7 +187,6 @@
                             Padding="14"
                             Effect="{StaticResource SoftShadow}">
 
-                        
                         <ListBox ItemsSource="{Binding StatusFilterOptions}"
                                  SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
                                  Background="Transparent"
@@ -198,7 +213,6 @@
             </ScrollViewer>
         </Border>
 
-        
         <Grid Grid.Column="1"
               Margin="20">
 
@@ -223,21 +237,21 @@
                     Effect="{StaticResource SoftShadow}">
 
                 <DataGrid ItemsSource="{Binding FilteredEntities}"
-          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
-          AutoGenerateColumns="False"
-          CanUserAddRows="False"
-          IsReadOnly="True"
-          SelectionMode="Single"
-          HeadersVisibility="Column"
-          BorderThickness="0"
-          Background="Transparent"
-          RowHeight="46"
-          MinRowHeight="46"
-          ColumnHeaderHeight="42"
-          FontSize="13"
-          GridLinesVisibility="Horizontal"
-          HorizontalGridLinesBrush="#E5EAF3"
-          ToolTip="Tabela svih monitorisanih puteva u sistemu">
+                          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          RowHeight="46"
+                          MinRowHeight="46"
+                          ColumnHeaderHeight="42"
+                          FontSize="13"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#E5EAF3"
+                          ToolTip="Tabela svih monitorisanih puteva u sistemu">
 
                     <DataGrid.Resources>
                         <Style x:Key="CenteredCellText" TargetType="TextBlock">
@@ -266,50 +280,50 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID"
-                            Binding="{Binding Id}"
-                            Width="80"
-                            ElementStyle="{StaticResource CenteredCellText}"/>
+                                            Binding="{Binding Id}"
+                                            Width="80"
+                                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTemplateColumn Header="Slika"
-                                Width="90">
+                                                Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Image Source="{Binding Type.ImagePath}"
-                           Width="38"
-                           Height="38"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
+                                           Width="38"
+                                           Height="38"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="Naziv"
-                            Binding="{Binding Name}"
-                            Width="1.6*"
-                            MinWidth="280"
-                            ElementStyle="{StaticResource NameCellText}"/>
+                                            Binding="{Binding Name}"
+                                            Width="1.6*"
+                                            MinWidth="280"
+                                            ElementStyle="{StaticResource NameCellText}"/>
 
                         <DataGridTextColumn Header="Tip"
-                            Binding="{Binding Type.Name}"
-                            Width="105"
-                            ElementStyle="{StaticResource CenteredCellText}"/>
+                                            Binding="{Binding Type.Name}"
+                                            Width="105"
+                                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTextColumn Header="Poslednja vrednost"
-                            Binding="{Binding LastValue}"
-                            Width="1*"
-                            MinWidth="165"
-                            ElementStyle="{StaticResource CenteredCellText}"/>
+                                            Binding="{Binding LastValue}"
+                                            Width="1*"
+                                            MinWidth="165"
+                                            ElementStyle="{StaticResource CenteredCellText}"/>
 
                         <DataGridTemplateColumn Header="Status"
-                                Width="0.8*"
-                                MinWidth="145">
+                                                Width="0.8*"
+                                                MinWidth="145">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Status}"
-                               Style="{StaticResource StatusCellText}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               TextAlignment="Center"/>
+                                               Style="{StaticResource StatusCellText}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -332,7 +346,6 @@
             </StackPanel>
         </Grid>
 
-         
         <Border Grid.Column="2"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -381,7 +394,6 @@
             </Grid>
         </Border>
 
-        
         <Grid Grid.ColumnSpan="3"
               Background="#80101826"
               Visibility="{Binding IsDeleteDialogVisible, Converter={StaticResource BooleanToVisibilityConverter}}">

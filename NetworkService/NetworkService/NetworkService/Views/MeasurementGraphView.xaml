@@ -70,8 +70,7 @@
                         <Canvas Width="{Binding MeasurementCanvasWidth}"
                                 Height="{Binding MeasurementCanvasHeight}"
                                 Background="#FBFCFE">
-
-                            <!-- EMPTY STATE -->
+ 
                             <TextBlock Text="Nema mjerenja za izabrani entitet."
                                        Width="320"
                                        FontSize="13"
@@ -80,8 +79,7 @@
                                        Visibility="{Binding HasNoMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"
                                        Canvas.Left="290"
                                        Canvas.Top="130"/>
-
-                            <!-- HORIZONTAL GRID LINES -->
+ 
                             <Line X1="60"
                                   Y1="35"
                                   X2="860"
@@ -127,7 +125,7 @@
                                   StrokeDashArray="4 4"
                                   Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <!-- Y AXIS -->
+                        
                             <Line X1="60"
                                   Y1="35"
                                   X2="60"
@@ -136,7 +134,7 @@
                                   StrokeThickness="1.2"
                                   Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <!-- X AXIS -->
+                          
                             <Line X1="60"
                                   Y1="232"
                                   X2="860"
@@ -159,7 +157,7 @@
                                        Canvas.Top="256"
                                        Visibility="{Binding HasMeasurements, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <!-- GRAPH LINES -->
+                          
                             <ItemsControl ItemsSource="{Binding MeasurementLines}"
                                           Width="{Binding MeasurementCanvasWidth}"
                                           Height="{Binding MeasurementCanvasHeight}"
@@ -184,7 +182,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- GRAPH POINTS -->
+                           
                             <ItemsControl ItemsSource="{Binding MeasurementMarkers}"
                                           Width="{Binding MeasurementCanvasWidth}"
                                           Height="{Binding MeasurementCanvasHeight}"
@@ -230,7 +228,7 @@
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"/>
 
-                                            <!-- ! -->
+                                        
                                             <TextBlock Text="!"
                                                        FontSize="10"
                                                        FontWeight="Bold"
@@ -255,7 +253,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- TIME LABELS -->
+                           
                             <ItemsControl ItemsSource="{Binding MeasurementLabels}"
                                           Width="{Binding MeasurementCanvasWidth}"
                                           Height="{Binding MeasurementCanvasHeight}"
@@ -289,7 +287,7 @@
             </Grid>
         </Border>
 
-        <!-- CG4 TYPE DISTRIBUTION -->
+         
         <Border Grid.Row="2"
                 Background="{StaticResource CardBgBrush}"
                 BorderBrush="{StaticResource CardBorderBrush}"
@@ -382,7 +380,7 @@
             </Grid>
         </Border>
 
-        <!-- LEGEND -->
+    
         <Border Grid.Row="3"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"

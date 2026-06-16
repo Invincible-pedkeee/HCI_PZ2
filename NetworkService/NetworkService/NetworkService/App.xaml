@@ -5,9 +5,7 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-        <!-- =================================================================
-             DESIGN TOKENS  (colors / brushes)
-             ================================================================= -->
+ 
         <Color x:Key="AccentColor">#2F6FED</Color>
 
         <SolidColorBrush x:Key="AccentBrush"         Color="#2F6FED"/>
@@ -46,7 +44,7 @@
         <SolidColorBrush x:Key="DisabledBgBrush"     Color="#EDEFF3"/>
         <SolidColorBrush x:Key="DisabledTextBrush"   Color="#A7AEB9"/>
 
-        <!-- Soft elevation shadow reused on cards / dialogs / toast -->
+ 
         <DropShadowEffect x:Key="SoftShadow"
                           Color="#1B2A4A"
                           BlurRadius="18"
@@ -54,9 +52,7 @@
                           Direction="270"
                           Opacity="0.12"/>
 
-        <!-- =================================================================
-             GLOBAL TYPOGRAPHY DEFAULTS
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
@@ -64,7 +60,7 @@
             <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
         </Style>
 
-        <!-- Section heading (e.g. DODAVANJE NOVOG ENTITETA) -->
+ 
         <Style x:Key="SectionHeader" TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="Segoe UI Semibold"/>
             <Setter Property="FontSize" Value="12"/>
@@ -72,22 +68,18 @@
             <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
         </Style>
 
-        <!-- Field label (small caption above inputs) -->
+ 
         <Style x:Key="FieldLabel" TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
         </Style>
-
-        <!-- Inline validation text -->
+ 
         <Style x:Key="ValidationText" TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
-
-        <!-- =================================================================
-             SEPARATOR
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type Separator}">
             <Setter Property="Background" Value="{StaticResource DividerBrush}"/>
             <Setter Property="Height" Value="1"/>
@@ -95,10 +87,7 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
 
-        <!-- =================================================================
-             BUTTONS
-             Base (implicit) = secondary outline button.
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
@@ -143,7 +132,7 @@
             </Setter>
         </Style>
 
-        <!-- Primary (accent filled) -->
+  
         <Style x:Key="PrimaryButton" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
@@ -183,7 +172,7 @@
             </Setter>
         </Style>
 
-        <!-- Danger (destructive) -->
+ 
         <Style x:Key="DangerButton" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
@@ -223,13 +212,13 @@
             </Setter>
         </Style>
 
-        <!-- Compact button used inside display slots -->
+  
         <Style x:Key="SlotButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Padding" Value="8,3"/>
         </Style>
 
-        <!-- Compact danger-tinted slot button -->
+ 
         <Style x:Key="SlotButtonDanger" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="11"/>
@@ -266,7 +255,7 @@
             </Setter>
         </Style>
 
-        <!-- Header navigation tab -->
+ 
         <Style x:Key="NavTabButton" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
@@ -305,9 +294,7 @@
             </Setter>
         </Style>
 
-        <!-- =================================================================
-             TEXTBOX
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
@@ -347,10 +334,7 @@
             </Setter>
         </Style>
 
-        <!-- =================================================================
-             COMBOBOX  (light styling via setters only - template untouched
-             so selection / dropdown behaviour stays exactly as-is)
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
@@ -369,9 +353,7 @@
             <Setter Property="Padding" Value="8,5"/>
         </Style>
 
-        <!-- =================================================================
-             DATAGRID
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="13"/>
@@ -443,8 +425,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-
-        <!-- Status cell text styling (used in entities DataGrid status column) -->
+ 
         <Style x:Key="StatusCellText" TargetType="{x:Type TextBlock}">
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="12"/>
@@ -457,9 +438,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- =================================================================
-             LISTBOX  (history panels) - items shown as light cards
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type ListBox}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -500,9 +479,7 @@
             </Setter>
         </Style>
 
-        <!-- =================================================================
-             TREEVIEW  (available entities)
-             ================================================================= -->
+ 
         <Style TargetType="{x:Type TreeView}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
