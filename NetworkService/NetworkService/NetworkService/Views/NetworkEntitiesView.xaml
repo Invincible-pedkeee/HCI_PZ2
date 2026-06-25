@@ -1,9 +1,23 @@
 ﻿<UserControl x:Class="NetworkService.Views.NetworkEntitiesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fa5="http://schemas.fontawesome.com/icons/">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <Style x:Key="ButtonIcon" TargetType="{x:Type fa5:SvgAwesome}">
+            <Setter Property="Width" Value="13"/>
+            <Setter Property="Height" Value="13"/>
+            <Setter Property="Margin" Value="0,0,7,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        </Style>
+
+        <Style x:Key="ButtonContentText" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="#FFFFFF">
@@ -73,12 +87,19 @@
                                        Style="{StaticResource ValidationText}"
                                        Margin="0,3,0,12"/>
 
-                            <Button Content="[+] DODAJ U SISTEM"
-                                    Style="{StaticResource PrimaryButton}"
+                            <Button Style="{StaticResource PrimaryButton}"
                                     Height="34"
                                     Command="{Binding AddEntityCommand}"
                                     Cursor="Hand"
-                                    ToolTip="Dodaj novi put u sistem za monitoring"/>
+                                    ToolTip="Dodaj novi put u sistem za monitoring">
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center">
+                                    <fa5:SvgAwesome Icon="Solid_PlusCircle"
+                                                    Style="{StaticResource ButtonIcon}"/>
+                                    <TextBlock Text="DODAJ U SISTEM"
+                                               Style="{StaticResource ButtonContentText}"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Border>
 
@@ -159,19 +180,33 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
-                                        Content="Primijeni"
                                         Style="{StaticResource PrimaryButton}"
                                         Height="32"
                                         Command="{Binding ApplyFilterCommand}"
                                         Cursor="Hand"
-                                        ToolTip="Primijeni izabrane filtere na tabelu"/>
+                                        ToolTip="Primijeni izabrane filtere na tabelu">
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center">
+                                        <fa5:SvgAwesome Icon="Solid_Filter"
+                                                        Style="{StaticResource ButtonIcon}"/>
+                                        <TextBlock Text="Primijeni"
+                                                   Style="{StaticResource ButtonContentText}"/>
+                                    </StackPanel>
+                                </Button>
 
                                 <Button Grid.Column="2"
-                                        Content="Poništi"
                                         Height="32"
                                         Command="{Binding ClearFilterCommand}"
                                         Cursor="Hand"
-                                        ToolTip="Poništi sve filtere i prikaži sve entitete"/>
+                                        ToolTip="Poništi sve filtere i prikaži sve entitete">
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center">
+                                        <fa5:SvgAwesome Icon="Solid_Times"
+                                                        Style="{StaticResource ButtonIcon}"/>
+                                        <TextBlock Text="Poništi"
+                                                   Style="{StaticResource ButtonContentText}"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -336,13 +371,20 @@
                         HorizontalAlignment="Right"
                         Margin="0,14,0,0">
 
-                <Button Content="[-] OBRIŠI SELEKTOVANO"
-                        Style="{StaticResource DangerButton}"
-                        Width="200"
+                <Button Style="{StaticResource DangerButton}"
+                        Width="210"
                         Height="34"
                         Command="{Binding RequestDeleteEntityCommand}"
                         Cursor="Hand"
-                        ToolTip="Obriši selektovani entitet iz sistema"/>
+                        ToolTip="Obriši selektovani entitet iz sistema">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <fa5:SvgAwesome Icon="Solid_TrashAlt"
+                                        Style="{StaticResource ButtonIcon}"/>
+                        <TextBlock Text="OBRIŠI SELEKTOVANO"
+                                   Style="{StaticResource ButtonContentText}"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 
@@ -378,18 +420,32 @@
                 <StackPanel Grid.Row="2"
                             Margin="0,14,0,0">
 
-                    <Button Content="Poništi poslednju akciju"
-                            Height="32"
+                    <Button Height="32"
                             Command="{Binding UndoCommand}"
                             Cursor="Hand"
-                            ToolTip="Poništi poslednju izvršenu akciju (Ctrl+Z)"/>
+                            ToolTip="Poništi poslednju izvršenu akciju (Ctrl+Z)">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <fa5:SvgAwesome Icon="Solid_Undo"
+                                            Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Poništi poslednju akciju"
+                                       Style="{StaticResource ButtonContentText}"/>
+                        </StackPanel>
+                    </Button>
 
-                    <Button Content="Poništi sve akcije"
-                            Height="32"
+                    <Button Height="32"
                             Margin="0,8,0,0"
                             Command="{Binding UndoAllCommand}"
                             Cursor="Hand"
-                            ToolTip="Poništi sve do sad izvršene akcije (Ctrl+Shift+Z)"/>
+                            ToolTip="Poništi sve do sad izvršene akcije (Ctrl+Shift+Z)">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <fa5:SvgAwesome Icon="Solid_History"
+                                            Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Poništi sve akcije"
+                                       Style="{StaticResource ButtonContentText}"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
@@ -438,19 +494,33 @@
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Right">
 
-                        <Button Content="ODUSTANI"
-                                Width="120"
+                        <Button Width="120"
                                 Height="34"
                                 Margin="0,0,12,0"
                                 Command="{Binding CancelDeleteEntityCommand}"
-                                Cursor="Hand"/>
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <fa5:SvgAwesome Icon="Solid_Times"
+                                                Style="{StaticResource ButtonIcon}"/>
+                                <TextBlock Text="ODUSTANI"
+                                           Style="{StaticResource ButtonContentText}"/>
+                            </StackPanel>
+                        </Button>
 
-                        <Button Content="DA, POTVRĐUJEM"
-                                Style="{StaticResource DangerButton}"
-                                Width="150"
+                        <Button Style="{StaticResource DangerButton}"
+                                Width="155"
                                 Height="34"
                                 Command="{Binding ConfirmDeleteEntityCommand}"
-                                Cursor="Hand"/>
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <fa5:SvgAwesome Icon="Solid_Check"
+                                                Style="{StaticResource ButtonIcon}"/>
+                                <TextBlock Text="DA, POTVRĐUJEM"
+                                           Style="{StaticResource ButtonContentText}"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>

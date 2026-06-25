@@ -3,10 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:model="clr-namespace:NetworkService.Model"
              xmlns:controls="clr-namespace:NetworkService.Controls"
-             xmlns:networkDisplayHelpers="clr-namespace:NetworkService.Helpers.NetworkDisplay">
+             xmlns:networkDisplayHelpers="clr-namespace:NetworkService.Helpers.NetworkDisplay"
+             xmlns:fa5="http://schemas.fontawesome.com/icons/">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <Style x:Key="ButtonIcon" TargetType="{x:Type fa5:SvgAwesome}">
+            <Setter Property="Width" Value="13"/>
+            <Setter Property="Height" Value="13"/>
+            <Setter Property="Margin" Value="0,0,7,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        </Style>
+
+        <Style x:Key="SmallButtonIcon" TargetType="{x:Type fa5:SvgAwesome}">
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        </Style>
+
+        <Style x:Key="ButtonContentText" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="#FFFFFF">
@@ -16,7 +38,7 @@
             <ColumnDefinition Width="270"/>
         </Grid.ColumnDefinitions>
 
-        
+
         <Border Grid.Column="0"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -96,7 +118,7 @@
             </Grid>
         </Border>
 
-         
+
         <Grid Grid.Column="1"
               Margin="20">
 
@@ -166,7 +188,7 @@
                                           Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}"
                                           Margin="8">
 
-                                         
+
                                         <StackPanel VerticalAlignment="Center">
                                             <StackPanel.Style>
                                                 <Style TargetType="StackPanel">
@@ -198,7 +220,7 @@
                                                        Margin="0,4,0,0"/>
                                         </StackPanel>
 
-                                        
+
                                         <Grid Visibility="{Binding IsOccupied, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
@@ -265,24 +287,38 @@
                                                         HorizontalAlignment="Center"
                                                         Margin="0,30,0,0">
 
-                                                <Button Content="Poveži"
-                                                        Style="{StaticResource SlotButton}"
-                                                        Width="70"
+                                                <Button Style="{StaticResource SlotButton}"
+                                                        Width="82"
                                                         Height="24"
                                                         Command="{Binding DataContext.ConnectSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
                                                         Cursor="Hand"
-                                                        ToolTip="Kreiranje veze sa drugim entitetom"/>
+                                                        ToolTip="Kreiranje veze sa drugim entitetom">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                HorizontalAlignment="Center">
+                                                        <fa5:SvgAwesome Icon="Solid_Link"
+                                                                        Style="{StaticResource SmallButtonIcon}"/>
+                                                        <TextBlock Text="Poveži"
+                                                                   Style="{StaticResource ButtonContentText}"/>
+                                                    </StackPanel>
+                                                </Button>
 
-                                                <Button Content="Ukloni"
-                                                        Style="{StaticResource SlotButtonDanger}"
-                                                        Width="80"
+                                                <Button Style="{StaticResource SlotButtonDanger}"
+                                                        Width="86"
                                                         Height="24"
                                                         Margin="6,30,30,30"
                                                         Command="{Binding DataContext.RemoveSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
                                                         Cursor="Hand"
-                                                        ToolTip="Ukloni entitet sa mreže"/>
+                                                        ToolTip="Ukloni entitet sa mreže">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                HorizontalAlignment="Center">
+                                                        <fa5:SvgAwesome Icon="Solid_TrashAlt"
+                                                                        Style="{StaticResource SmallButtonIcon}"/>
+                                                        <TextBlock Text="Ukloni"
+                                                                   Style="{StaticResource ButtonContentText}"/>
+                                                    </StackPanel>
+                                                </Button>
                                             </StackPanel>
                                         </Grid>
                                     </Grid>
@@ -300,7 +336,7 @@
             </Grid>
         </Grid>
 
-         
+
         <Border Grid.Column="2"
                 Background="{StaticResource PanelBgBrush}"
                 BorderBrush="{StaticResource PanelBorderBrush}"
@@ -334,18 +370,32 @@
                 <StackPanel Grid.Row="2"
                             Margin="0,14,0,0">
 
-                    <Button Content="Poništi poslednju akciju"
-                            Height="32"
+                    <Button Height="32"
                             Command="{Binding UndoCommand}"
                             Cursor="Hand"
-                            ToolTip="Undo last action on Network Display View"/>
+                            ToolTip="Undo last action on Network Display View">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <fa5:SvgAwesome Icon="Solid_Undo"
+                                            Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Poništi poslednju akciju"
+                                       Style="{StaticResource ButtonContentText}"/>
+                        </StackPanel>
+                    </Button>
 
-                    <Button Content="Poništi sve akcije"
-                            Height="32"
+                    <Button Height="32"
                             Margin="0,8,0,0"
                             Command="{Binding UndoAllCommand}"
                             Cursor="Hand"
-                            ToolTip="Undo all actions on Network Display View"/>
+                            ToolTip="Undo all actions on Network Display View">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <fa5:SvgAwesome Icon="Solid_History"
+                                            Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Poništi sve akcije"
+                                       Style="{StaticResource ButtonContentText}"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
