@@ -270,7 +270,7 @@ namespace NetworkService.ViewModel
         {
             return SelectedEntity != null;
         }
-
+        //dialog otvara
         private void OnRequestDeleteEntity()
         {
             IsDeleteDialogVisible = true;

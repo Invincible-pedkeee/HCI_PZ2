@@ -44,7 +44,7 @@
         <SolidColorBrush x:Key="DisabledBgBrush"     Color="#EDEFF3"/>
         <SolidColorBrush x:Key="DisabledTextBrush"   Color="#A7AEB9"/>
 
- 
+        <!--sjenke-->
         <DropShadowEffect x:Key="SoftShadow"
                           Color="#1B2A4A"
                           BlurRadius="18"
@@ -132,7 +132,7 @@
             </Setter>
         </Style>
 
-  
+        <!--Plavo dugme-->
         <Style x:Key="PrimaryButton" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
@@ -172,7 +172,7 @@
             </Setter>
         </Style>
 
- 
+        <!--crveno dugme-->
         <Style x:Key="DangerButton" TargetType="{x:Type Button}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>

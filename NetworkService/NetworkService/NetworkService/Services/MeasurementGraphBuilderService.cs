@@ -85,7 +85,7 @@ namespace NetworkService.Services
 
             return result;
         }
-
+        //procenti
         public DistributionGraphBuildResult BuildDistributionGraph(ObservableCollection<NetworkEntity> entities)
         {
             DistributionGraphBuildResult result = new DistributionGraphBuildResult();

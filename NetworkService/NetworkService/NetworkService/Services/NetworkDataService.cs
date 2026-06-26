@@ -139,8 +139,6 @@ namespace NetworkService.Services
                 entity.IsValueValid);
 
             Measurements.Add(measurement);
-
-            // Bitno: mjerenje se upisuje u .txt fajl.
             measurementLogService.WriteMeasurement(measurement, entity);
 
             AddHistory("Primljeno mjerenje za ID: " + entity.Id + ", vrijednost: " + value);
@@ -150,7 +148,7 @@ namespace NetworkService.Services
 
         public ObservableCollection<Measurement> GetLastMeasurementsForEntity(int entityId, int count)
         {
-            // Bitno: graf sada čita iz .txt fajla, a ne iz memorijske kolekcije.
+            //   graf sada čita iz .txt fajla, a ne iz memorijske kolekcije.
             return measurementLogService.ReadLastMeasurementsForEntity(entityId, count);
         }
 

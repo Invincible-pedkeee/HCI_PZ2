@@ -22,6 +22,8 @@ namespace NetworkService.ViewModel
 
 
         public ToastNotificationService ToastService { get; private set; }
+
+        //navigacioni bar 
         public MyICommandWithParameter<string> NavigationCommand { get; private set; }
 
 
@@ -131,6 +133,7 @@ namespace NetworkService.ViewModel
             GlobalUndoCommand = new MyICommand(OnGlobalUndo);
             GlobalUndoAllCommand = new MyICommand(OnGlobalUndoAll);
 
+            //prijem mjerenja
             meteringReceiverService = new MeteringReceiverService(
             GetEntityCount,
             OnMeasurementReceived,
@@ -138,6 +141,7 @@ namespace NetworkService.ViewModel
 
             meteringReceiverService.Start();
 
+            //ako dodje do brisanja ili dodavanja entiteta
             simulatorRestartService = new SimulatorRestartService();
             dataService.Entities.CollectionChanged += Entities_CollectionChanged;
 

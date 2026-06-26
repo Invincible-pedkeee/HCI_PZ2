@@ -65,29 +65,29 @@ namespace NetworkService.Model
 
             if (string.IsNullOrWhiteSpace(IdText))
             {
-                ValidationErrors["IdText"] = "ID is required.";
+                ValidationErrors["IdText"] = "ID je obavezan.";
             }
             else if (!int.TryParse(IdText, out parsedId))
             {
-                ValidationErrors["IdText"] = "ID must be a whole number.";
+                ValidationErrors["IdText"] = "ID mora biti citav broj.";
             }
             else if (parsedId <= 0)
             {
-                ValidationErrors["IdText"] = "ID must be greater than zero.";
+                ValidationErrors["IdText"] = "ID mora biti veci od 0.";
             }
             else if (existingEntities.Any(entity => entity.Id == parsedId))
             {
-                ValidationErrors["IdText"] = "ID must be unique.";
+                ValidationErrors["IdText"] = "ID mora biti jedinstven.";
             }
 
             if (string.IsNullOrWhiteSpace(Name))
             {
-                ValidationErrors["Name"] = "Road name is required.";
+                ValidationErrors["Name"] = "Ime puta je obavezno.";
             }
 
             if (SelectedType == null)
             {
-                ValidationErrors["SelectedType"] = "Road type must be selected.";
+                ValidationErrors["SelectedType"] = "Tip puta mora biti odabran.";
             }
         }
     }
